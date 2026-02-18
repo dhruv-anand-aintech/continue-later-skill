@@ -6,7 +6,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "create-continuation": "dist/cli.js"
+    "continue-later": "dist/cli.js",
+    "resume-from-earlier": "dist/cli.js"
   },
   "files": [
     "dist",

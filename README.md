@@ -2,6 +2,10 @@
 
 Generate comprehensive **continuation.md** handoff documentation for fresh development sessions. Perfect for handing off projects to new team members, resuming long-running tasks, or documenting your work before context gets lost.
 
+**Two commands, two workflows:**
+- **`continue-later`** - Create a continuation file (hand off or save your state)
+- **`resume-from-earlier`** - Load and read a continuation file (pick up where you left off)
+
 ## The Problem
 
 Long projects, multi-week tasks, or team handoffs require detailed context that's easy to lose:
@@ -25,9 +29,15 @@ Or use it locally in a project:
 npm install --save-dev create-continuation-skill
 ```
 
-## Quick Start
+## Usage: Two Workflows
 
-### 1. Create a configuration file (`continuation-config.yaml`)
+### Workflow 1: Continue Later (Creating a Handoff)
+
+Use **`continue-later`** to save your project state for handoff or future resumption.
+
+#### Step 1: Create a configuration file
+
+Save this as `continuation-config.yaml`:
 
 ```yaml
 projectName: MyAwesomeApp
@@ -45,106 +55,204 @@ techStack:
 
 currentState:
   working:
-    - Login / authentication (OAuth2 flow)
-    - Water usage dashboard
-    - Daily email alerts
+    - User authentication
+    - Real-time dashboard
+    - Email notifications
   broken:
-    - Chart rendering on Android API 28 (due to WebView version)
-    - Real-time sync drops after 10 minutes (likely socket timeout)
+    - File upload for videos (500 error)
+    - Widget refresh on Android
   inProgress:
-    - Offline mode with sync queue
-    - Dark mode UI refactor
+    - Dark mode implementation
+    - Performance optimizations
 
 recentChanges: |
-  ### Fixed Android Chart Issue
-  The chart library (react-native-svg) was breaking on API 28 because
-  the WebView didn't support SVG transforms. Switched to a canvas-based
-  library (react-native-canvas). All existing chart tests pass.
+  ### Fixed Real-time Sync Issue
+  The dashboard wasn't syncing data in real-time due to socket timeout after 10 minutes.
+  Implemented heartbeat mechanism: client sends ping every 5 minutes, server responds with pong.
 
   ### Migrated to TimescaleDB
-  Replaced vanilla PostgreSQL with TimescaleDB for time-series queries.
-  Water usage queries are now 100x faster (3s → 30ms).
-  Migration script created and tested on staging.
+  Replaced vanilla PostgreSQL with TimescaleDB for time-series data.
+  Water usage queries now 100x faster (3s → 30ms).
 
 pendingTasks:
-  - Test offline sync queue with poor network conditions (using Clumsy)
-  - Add dark mode toggle to settings screen
-  - Implement push notifications for alert escalation
-  - Security audit (focus on OAuth2 token refresh logic)
-  - Performance profiling on low-end Android devices
+  - Fix file upload for videos (investigate 500 error)
+  - Test dark mode on Android 8-14
+  - Performance test with 1M+ records
+  - Security audit of API endpoints
 
 keyDecisions:
-  - Used canvas-based charting instead of SVG to support older Android APIs
-  - TimescaleDB over Postgres for time-series optimization (agreed with team on perf vs complexity tradeoff)
-  - Real-time sync uses websockets with auto-reconnect + exponential backoff instead of long-polling
+  - Used heartbeat mechanism instead of long-polling for real-time updates
+  - Chose TimescaleDB over vanilla Postgres for time-series optimization
 
 gotchas:
-  - title: React Native WebView SVG Support
-    description: SVG transforms aren't supported in WebView on Android API < 29
-    solution: Switch to canvas-based charting library
-    lesson: Test on min supported API level early; don't assume WebView features
+  - title: WebSocket NAT Timeout
+    description: Idle connections drop after exactly 10 minutes
+    solution: Implement heartbeat pings every 5 minutes
+    lesson: Always add keepalive to long-lived connections
 
-  - title: Socket Timeout After 10 Minutes
-    description: Real-time connection drops exactly every 10 minutes (suspiciously round number)
-    solution: Added keepalive pings every 5 minutes; appears to be NAT/firewall timeout
-    lesson: Use monitored health checks; timeouts are often environmental, not code bugs
-
-  - title: TimescaleDB Binary Compatibility
-    description: Docker image of TimescaleDB 2.8 doesn't work on M1 Macs (arm64v8 tag missing)
-    solution: Build local image from source or use Postgres in dev, TimescaleDB only in prod
-    lesson: Always test database version/architecture match; Docker's default tags can be misleading
+  - title: File Upload Timeout
+    description: Large videos fail with 500 error after 30s
+    solution: Implement chunked/multipart upload
+    lesson: Test with production file sizes early
 
 buildInstructions: |
-  ### Prerequisites
   ```bash
-  # Install dependencies
   npm install
-  gem install bundler  # for iOS pods
-  
-  # Set up environment
-  cp .env.example .env
-  # Edit .env with your API keys (get from 1password)
-  ```
-
-  ### Development Build
-  ```bash
-  # iOS
-  npm run build:ios
-  # Opens simulator automatically
-  open ios/MyAwesomeApp.xcworkspace
-  
-  # Android
-  npm run build:android
-  adb install build/app.apk
-  ```
-
-  ### Run Tests
-  ```bash
-  npm test                    # Unit + integration tests
-  detox build-framework-cache && detox test --configuration ios.sim.debug  # E2E
+  npm run dev
   ```
 
 deployInstructions: |
-  ### Deploy to Staging
   ```bash
-  # Build APK + IPA
-  npm run build:staging
-  
-  # Deploy to Firebase App Distribution
-  npm run deploy:staging
-  
-  # Notify team
-  npx changelog-release staging
+  npm run build && npm run deploy
   ```
+```
 
-  ### Deploy to Production
-  ```bash
-  # Requires approval from 2 reviewers
-  npm run build:release
-  
-  # Apple TestFlight
-  npm run deploy:testflight
-  
-  # Google Play Console (manual final approval required)
-  npm run deploy:playstore
-  ```
+#### Step 2: Generate the continuation file
+
+```bash
+continue-later --config continuation-config.yaml --output continuation.md
+```
+
+This creates `continuation.md` with all sections properly formatted and ready to share.
+
+---
+
+### Workflow 2: Resume From Earlier (Reading a Handoff)
+
+Use **`resume-from-earlier`** to load and read a continuation file.
+
+#### View the Full Continuation
+
+```bash
+resume-from-earlier --file continuation.md
+```
+
+Displays the entire continuation file beautifully formatted.
+
+#### View Specific Sections
+
+```bash
+# Show just the pending tasks
+resume-from-earlier --file continuation.md --section tasks
+
+# Show just the gotchas (learn from past mistakes)
+resume-from-earlier --file continuation.md --section gotchas
+
+# Show current state (what works/broken)
+resume-from-earlier --file continuation.md --section state
+
+# Show recent changes (context of where we left off)
+resume-from-earlier --file continuation.md --section recent
+
+# Show build instructions (how to start)
+resume-from-earlier --file continuation.md --section build
+
+# Show key decisions (don't re-litigate them)
+resume-from-earlier --file continuation.md --section decisions
+```
+
+**Available sections:**
+- `project` - Project overview
+- `state` - Current state (working/broken/in-progress)
+- `tech` - Tech stack
+- `tasks` - Pending tasks (next steps)
+- `gotchas` - Gotchas & traps (learn from history)
+- `recent` - Recent changes (context)
+- `decisions` - Key technical decisions
+- `build` - Build instructions
+- `deploy` - Deploy instructions
+
+---
+
+## Use Cases
+
+✅ **Team Handoffs** - Hand off to new team members with full context
+✅ **Long Projects** - Resume after weeks/months with zero ramp-up time
+✅ **Vacation/Leave** - Someone else can continue your work seamlessly
+✅ **Multi-Sprint Work** - Document progress before context fades
+✅ **Retrospectives** - Capture lessons learned for future reference
+✅ **Onboarding** - Provide incoming developers with architectural decisions
+
+## Features
+
+✅ **`continue-later` command** - Generate handoff documentation from YAML
+✅ **`resume-from-earlier` command** - Load and read continuation files
+✅ **YAML configuration** - Easy to write and version control
+✅ **Markdown output** - Beautiful, GitHub-ready format
+✅ **CLI tool** - Use from terminal or scripts
+✅ **Programmatic API** - Use in Node.js code
+✅ **TypeScript support** - Full type definitions
+✅ **Real-world examples** - Django, React Native, etc.
+
+## Programmatic Usage
+
+```typescript
+import {
+  ContinuationBuilder,
+  ContinuationGenerator,
+  loadMarkdown,
+} from "create-continuation-skill";
+
+// Create a continuation
+const config = new ContinuationBuilder()
+  .setProject("My App", "A real-time chat application")
+  .setWorkingDirectory("/path/to/project")
+  .setTechStack(["Node.js", "React", "MongoDB"])
+  .setState(
+    ["Login", "Chat UI"], // working
+    ["Group notifications"], // broken
+    ["File sharing"] // in progress
+  )
+  .setRecentChanges("Implemented exponential backoff for socket reconnections")
+  .setPendingTasks(["Fix group notifications", "Add typing indicators"])
+  .addGotcha({
+    title: "Socket timeout after 10 minutes",
+    description: "NAT timeout causes real-time disconnect",
+    solution: "Added heartbeat pings every 5 minutes",
+    lesson: "Long-lived connections need keepalives",
+  })
+  .setBuildInstructions("npm install && npm run dev")
+  .setDeployInstructions("npm run deploy")
+  .build();
+
+const generator = new ContinuationGenerator(config);
+const markdown = generator.generate();
+console.log(markdown);
+
+// Load and read a continuation
+const content = loadMarkdown("continuation.md");
+console.log(content);
+```
+
+## Examples
+
+See [examples/](examples/) for real-world continuation configs.
+
+## Contributing
+
+Have ideas? Found a bug? Want to add features?
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
+
+## Publishing
+
+To publish the package to npm:
+
+See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed steps.
+
+## License
+
+MIT - use freely in your projects!
+
+---
+
+**Ready to get started?**
+
+```bash
+# Create your first continuation
+continue-later --config continuation-config.yaml
+
+# Later, resume from it
+resume-from-earlier --file continuation.md
+resume-from-earlier --file continuation.md --section tasks
+```

@@ -1,8 +1,13 @@
 # Quick Start: create-continuation-skill
 
-A production-ready npm package for generating **continuation.md** handoff documentation.
+A production-ready npm package with **two commands** for comprehensive handoff documentation:
+
+- **`continue-later`** - Generate handoff documentation from YAML config
+- **`resume-from-earlier`** - Load and read continuation files
 
 ## What It Does
+
+### continue-later Command
 
 Generates comprehensive handoff documentation from a YAML config file:
 - Project overview and tech stack
@@ -13,6 +18,13 @@ Generates comprehensive handoff documentation from a YAML config file:
 - **Gotchas & traps** (saves hours for the next developer)
 - Build and deploy instructions (exact commands)
 
+### resume-from-earlier Command
+
+Loads and displays a continuation file:
+- View full continuation or specific sections
+- Extract tasks, gotchas, build instructions, etc.
+- Perfect for picking up where you left off
+
 ## Install
 
 ```bash
@@ -21,9 +33,11 @@ npm install -g create-continuation-skill
 npm install --save-dev create-continuation-skill
 ```
 
-## Usage
+## Usage: Two Commands
 
-### 1. Create a config file
+### Command 1: continue-later (Generate)
+
+Create a configuration file:
 
 ```yaml
 # continuation-config.yaml
@@ -46,7 +60,7 @@ currentState:
     - Dark mode UI
 
 recentChanges: |
-  Fixed export crash by streaming large datasets instead of loading into memory.
+  Fixed export crash by streaming large datasets.
   Implemented batching logic that writes 1000 rows at a time.
 
 pendingTasks:
@@ -73,13 +87,30 @@ deployInstructions: |
 
 See [examples/continuation-config.yaml](examples/continuation-config.yaml) for a full example.
 
-### 2. Generate the continuation file
+Then generate:
 
 ```bash
-create-continuation --config continuation-config.yaml --output continuation.md
+continue-later --config continuation-config.yaml --output continuation.md
 ```
 
 This creates `continuation.md` with all sections properly formatted and ready to share.
+
+### Command 2: resume-from-earlier (Read)
+
+Load and display a continuation file:
+
+```bash
+# View the entire continuation
+resume-from-earlier --file continuation.md
+
+# View specific sections
+resume-from-earlier --file continuation.md --section tasks
+resume-from-earlier --file continuation.md --section gotchas
+resume-from-earlier --file continuation.md --section state
+resume-from-earlier --file continuation.md --section build
+```
+
+Perfect for picking up where you left off or reviewing project status.
 
 ## Use Cases
 
@@ -135,7 +166,9 @@ See [examples/](examples/) for real-world continuation config files:
 
 ## Features
 
+✅ **Two commands** - `continue-later` (generate) and `resume-from-earlier` (read)
 ✅ **YAML configuration** - Easy to write and version control
+✅ **Section extraction** - View specific parts (tasks, gotchas, build, etc.)
 ✅ **Structured sections** - Project, state, decisions, gotchas, etc.
 ✅ **Markdown output** - Beautiful, readable format
 ✅ **CLI tool** - Use from terminal or scripts
@@ -165,8 +198,13 @@ MIT - use freely in your projects!
 
 ---
 
-**Ready to generate your first continuation?** Copy [examples/continuation-config.yaml](examples/continuation-config.yaml), edit it for your project, and run:
+**Ready to create your first continuation?** Copy [examples/continuation-config.yaml](examples/continuation-config.yaml), edit it for your project, and run:
 
 ```bash
-create-continuation --config YOUR-CONFIG.yaml
+# Generate a continuation
+continue-later --config YOUR-CONFIG.yaml
+
+# Later, resume from it
+resume-from-earlier --file continuation.md
+resume-from-earlier --file continuation.md --section tasks
 ```

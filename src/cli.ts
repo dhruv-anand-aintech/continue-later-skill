@@ -1,23 +1,25 @@
 #!/usr/bin/env node
 
 import { readFileSync, existsSync } from "fs";
-import { resolve } from "path";
+import { resolve, basename } from "path";
 import { ContinuationGenerator, ContinuationBuilder } from "./generator.js";
-import { loadConfig, saveMarkdown } from "./io.js";
+import { loadConfig, saveMarkdown, loadMarkdown } from "./io.js";
 
 const args = process.argv.slice(2);
+const commandName = basename(process.argv[1]);
 
 /**
- * Display CLI help
+ * Display CLI help for continue-later command
  */
-function showHelp(): void {
+function showContinueLaterHelp(): void {
   console.log(`
-create-continuation-skill
+continue-later
 
 Generate comprehensive continuation.md handoff documentation for fresh sessions.
+Perfect for handing off to new team members or resuming after a long break.
 
 Usage:
-  create-continuation [options]
+  continue-later [options]
 
 Options:
   --config <file>      Load configuration from YAML file
@@ -27,13 +29,43 @@ Options:
 
 Examples:
   # Generate from config file
-  create-continuation --config continuation-config.yaml
+  continue-later --config continuation-config.yaml
 
   # Output to specific file
-  create-continuation --config config.yaml --output docs/handoff.md
+  continue-later --config config.yaml --output docs/handoff.md
 
-  # Use interactive mode (coming soon)
-  create-continuation
+For more info: https://github.com/dhruvanand/create-continuation-skill
+`);
+}
+
+/**
+ * Display CLI help for resume-from-earlier command
+ */
+function showResumeFromEarlierHelp(): void {
+  console.log(`
+resume-from-earlier
+
+Load and display a continuation.md file to quickly understand project state.
+Use after reading a continuation.md to extract specific information.
+
+Usage:
+  resume-from-earlier [options]
+
+Options:
+  --file <file>        Path to continuation.md file to load (required)
+  --section <name>     Show specific section: project, state, tasks, gotchas, etc.
+  --help              Show this help message
+  --version           Show version
+
+Examples:
+  # Display full continuation
+  resume-from-earlier --file continuation.md
+
+  # Show only pending tasks
+  resume-from-earlier --file continuation.md --section tasks
+
+  # Show only gotchas
+  resume-from-earlier --file continuation.md --section gotchas
 
 For more info: https://github.com/dhruvanand/create-continuation-skill
 `);
@@ -50,9 +82,55 @@ function showVersion(): void {
 }
 
 /**
- * Parse CLI arguments
+ * Extract section from markdown
  */
-function parseArgs(): { config?: string; output: string; help: boolean } {
+function extractSection(markdown: string, section: string): string {
+  const sectionMap: Record<string, string> = {
+    project: "## What This Project Is",
+    state: "## Current State",
+    tasks: "## Pending Tasks",
+    gotchas: "## Gotchas & Traps",
+    tech: "## Tech Stack",
+    build: "## How to Build",
+    deploy: "## How to Deploy",
+    decisions: "## Key Technical Decisions",
+    recent: "## What Was Just Done",
+  };
+
+  const sectionHeader = sectionMap[section.toLowerCase()];
+  if (!sectionHeader) {
+    console.error(`Unknown section: ${section}`);
+    console.error(
+      "Available: project, state, tasks, gotchas, tech, build, deploy, decisions, recent"
+    );
+    process.exit(1);
+  }
+
+  const lines = markdown.split("\n");
+  const startIdx = lines.findIndex((l) => l.includes(sectionHeader));
+
+  if (startIdx === -1) {
+    console.error(`Section not found: ${sectionHeader}`);
+    process.exit(1);
+  }
+
+  // Find next section header
+  const endIdx = lines.findIndex(
+    (l, i) => i > startIdx && l.startsWith("## ") && !l.includes(sectionHeader)
+  );
+
+  const endLine = endIdx === -1 ? lines.length : endIdx;
+  return lines.slice(startIdx, endLine).join("\n");
+}
+
+/**
+ * Parse CLI arguments for continue-later
+ */
+function parseContinueLaterArgs(): {
+  config?: string;
+  output: string;
+  help: boolean;
+} {
   let config: string | undefined;
   let output = "continuation.md";
   let help = false;
@@ -74,13 +152,41 @@ function parseArgs(): { config?: string; output: string; help: boolean } {
 }
 
 /**
- * Main CLI entry point
+ * Parse CLI arguments for resume-from-earlier
  */
-async function main(): Promise<void> {
-  const { config, output, help } = parseArgs();
+function parseResumeFromEarlierArgs(): {
+  file?: string;
+  section?: string;
+  help: boolean;
+} {
+  let file: string | undefined;
+  let section: string | undefined;
+  let help = false;
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--file" && i + 1 < args.length) {
+      file = args[++i];
+    } else if (args[i] === "--section" && i + 1 < args.length) {
+      section = args[++i];
+    } else if (args[i] === "--help" || args[i] === "-h") {
+      help = true;
+    } else if (args[i] === "--version" || args[i] === "-v") {
+      showVersion();
+      process.exit(0);
+    }
+  }
+
+  return { file, section, help };
+}
+
+/**
+ * Handle continue-later command (generate continuation)
+ */
+async function handleContinueLater(): Promise<void> {
+  const { config, output, help } = parseContinueLaterArgs();
 
   if (help) {
-    showHelp();
+    showContinueLaterHelp();
     process.exit(0);
   }
 
@@ -109,6 +215,58 @@ async function main(): Promise<void> {
   } catch (error) {
     console.error(`Error: ${error}`);
     process.exit(1);
+  }
+}
+
+/**
+ * Handle resume-from-earlier command (load and display continuation)
+ */
+async function handleResumeFromEarlier(): Promise<void> {
+  const { file, section, help } = parseResumeFromEarlierArgs();
+
+  if (help) {
+    showResumeFromEarlierHelp();
+    process.exit(0);
+  }
+
+  if (!file) {
+    console.error(
+      "Error: --file argument required. Use --help for usage information."
+    );
+    process.exit(1);
+  }
+
+  if (!existsSync(file)) {
+    console.error(`Error: Continuation file not found: ${file}`);
+    process.exit(1);
+  }
+
+  try {
+    const markdown = loadMarkdown(file);
+
+    if (section) {
+      const extracted = extractSection(markdown, section);
+      console.log(extracted);
+    } else {
+      console.log(markdown);
+    }
+  } catch (error) {
+    console.error(`Error: ${error}`);
+    process.exit(1);
+  }
+}
+
+/**
+ * Main CLI entry point - dispatch to correct command
+ */
+async function main(): Promise<void> {
+  if (commandName.includes("continue-later")) {
+    await handleContinueLater();
+  } else if (commandName.includes("resume-from-earlier")) {
+    await handleResumeFromEarlier();
+  } else {
+    // Default to continue-later
+    await handleContinueLater();
   }
 }
 
