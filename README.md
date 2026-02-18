@@ -65,7 +65,7 @@ The skill produces markdown with these sections:
 
 ## Example
 
-See [examples/continuation-config.yaml](examples/continuation-config.yaml) for a complete example structure (YAML format for reference—the AI generates markdown directly).
+See [examples/continuation-example.md](examples/continuation-example.md) for an example.
 
 ## Use Cases
 

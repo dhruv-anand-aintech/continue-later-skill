@@ -35,7 +35,7 @@
   ],
   "documentation": {
     "main": "SKILL.md",
-    "example": "examples/continuation-config.yaml"
+    "example": "examples/continuation-example.md"
   },
   "features": [
     "Generate continuation.md from project context",
