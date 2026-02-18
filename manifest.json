@@ -1,0 +1,76 @@
+{
+  "name": "Continue Later",
+  "id": "continue-later-skill",
+  "version": "1.0.0",
+  "description": "Generate and manage project continuation documentation for seamless handoffs and knowledge preservation across coding sessions",
+  "author": "Dhruv Anand",
+  "license": "MIT",
+  "homepage": "https://github.com/dhruvanand/continue-later-skill",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dhruvanand/continue-later-skill"
+  },
+  "keywords": [
+    "continuation",
+    "handoff",
+    "documentation",
+    "project-management",
+    "knowledge-preservation",
+    "team-workflow",
+    "cursor-skill"
+  ],
+  "categories": [
+    "productivity",
+    "documentation",
+    "workflow"
+  ],
+  "commands": [
+    {
+      "name": "continue-later",
+      "description": "Generate project continuation documentation from YAML config",
+      "usage": "continue-later --config continuation-config.yaml"
+    },
+    {
+      "name": "resume-from-earlier",
+      "description": "Load and display continuation files with optional section extraction",
+      "usage": "resume-from-earlier --file continuation.md [--section SECTION]"
+    }
+  ],
+  "requirements": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "installation": {
+    "global": "npm install -g create-continuation-skill",
+    "local": "npm install --save-dev create-continuation-skill"
+  },
+  "documentation": {
+    "main": "README.md",
+    "quickstart": "QUICK_START.md",
+    "setup": "COMPLETE_SETUP.md",
+    "integration": "AGENT_INTEGRATION.md",
+    "example": "examples/continuation-config.yaml"
+  },
+  "features": [
+    "Two-command workflow (generate + resume)",
+    "Section extraction for quick lookups",
+    "YAML configuration input",
+    "Beautiful markdown output",
+    "Integration with all major coding agents",
+    "Automation support (cron, GitHub Actions)",
+    "Git-friendly versioning",
+    "TypeScript support"
+  ],
+  "useCases": [
+    "Team handoffs and transitions",
+    "Long-running project documentation",
+    "Onboarding new developers",
+    "Knowledge preservation",
+    "Architectural decision logging",
+    "Gotcha and lesson tracking"
+  ],
+  "screenshots": [],
+  "rating": 5,
+  "downloads": 0,
+  "lastUpdated": "2026-02-18"
+}
