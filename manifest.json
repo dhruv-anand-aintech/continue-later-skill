@@ -24,42 +24,26 @@
     "documentation",
     "workflow"
   ],
-  "commands": [
-    {
-      "name": "continue-later",
-      "description": "Generate project continuation documentation from YAML config",
-      "usage": "continue-later --config continuation-config.yaml"
-    },
-    {
-      "name": "resume-from-earlier",
-      "description": "Load and display continuation files with optional section extraction",
-      "usage": "resume-from-earlier --file continuation.md [--section SECTION]"
-    }
+  "triggers": [
+    "hand this off",
+    "continue later",
+    "save project state",
+    "create a continuation",
+    "document where we left off",
+    "resume from earlier",
+    "what was I working on"
   ],
-  "requirements": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
-  },
-  "installation": {
-    "global": "npm install -g create-continuation-skill",
-    "local": "npm install --save-dev create-continuation-skill"
-  },
   "documentation": {
-    "main": "README.md",
-    "quickstart": "QUICK_START.md",
-    "setup": "COMPLETE_SETUP.md",
-    "integration": "AGENT_INTEGRATION.md",
+    "main": "SKILL.md",
     "example": "examples/continuation-config.yaml"
   },
   "features": [
-    "Two-command workflow (generate + resume)",
+    "Generate continuation.md from project context",
+    "Structured sections: project, state, tasks, gotchas, decisions",
+    "Resume from existing continuation files",
     "Section extraction for quick lookups",
-    "YAML configuration input",
-    "Beautiful markdown output",
-    "Integration with all major coding agents",
-    "Automation support (cron, GitHub Actions)",
     "Git-friendly versioning",
-    "TypeScript support"
+    "No external dependencies"
   ],
   "useCases": [
     "Team handoffs and transitions",
@@ -68,9 +52,5 @@
     "Knowledge preservation",
     "Architectural decision logging",
     "Gotcha and lesson tracking"
-  ],
-  "screenshots": [],
-  "rating": 5,
-  "downloads": 0,
-  "lastUpdated": "2026-02-18"
+  ]
 }

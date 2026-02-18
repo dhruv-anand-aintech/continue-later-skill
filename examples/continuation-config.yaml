@@ -1,5 +1,6 @@
-# Example continuation configuration for a Django web app
-# Copy and adapt this for your project
+# Structure reference for continuation.md
+# When the user asks to "hand this off," the AI generates continuation.md
+# following this structure, using actual project context (not this template).
 
 projectName: Django Blog Platform
 workingDirectory: /Users/dev/projects/blog-platform
