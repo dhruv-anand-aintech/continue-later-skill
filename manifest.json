@@ -5,10 +5,10 @@
   "description": "Generate and manage project continuation documentation for seamless handoffs and knowledge preservation across coding sessions",
   "author": "Dhruv Anand",
   "license": "MIT",
-  "homepage": "https://github.com/dhruvanand/continue-later-skill",
+  "homepage": "https://github.com/dhruv-anand-aintech/continue-later-skill",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dhruvanand/continue-later-skill"
+    "url": "https://github.com/dhruv-anand-aintech/continue-later-skill"
   },
   "keywords": [
     "continuation",
