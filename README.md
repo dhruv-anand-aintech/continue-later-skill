@@ -67,6 +67,13 @@ The skill produces markdown with these sections:
 
 See [examples/continuation-example.md](examples/continuation-example.md) for an example.
 
+## Continue Later Fast (companion skill)
+
+For a **minimal, no-summary** handoff: raw git context only (`git log`, `status`, `diff --stat`, recent files), written straight to `continuation.md` with no LLM narrative. Useful for “quick save,” “just dump the context,” or as a fast step before running the full Continue Later skill.
+
+- **Skill file:** [skills/continue-later-fast/SKILL.md](skills/continue-later-fast/SKILL.md)
+- **Manual install:** copy the `continue-later-fast` folder into your skills directory (for example `.cursor/skills/` or `.claude/skills/`, depending on your setup) so the agent loads `SKILL.md` from that folder name.
+
 ## Use Cases
 
 - **Team handoffs** — Hand off to teammates with full context

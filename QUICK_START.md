@@ -24,6 +24,10 @@ Say to your AI:
 
 The AI reads `continuation.md` and presents the relevant sections.
 
+### Continue Later Fast (optional)
+
+Say **“quick save”** or **“/continue-later-fast”** if you installed the companion skill from [skills/continue-later-fast/SKILL.md](skills/continue-later-fast/SKILL.md). It writes raw git output to `continuation.md` with no narrative summary—fast ground truth before a full handoff.
+
 ## That's It
 
 No npm, no CLI, no config files. Install from Skillfish and use natural language.

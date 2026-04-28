@@ -31,11 +31,15 @@
     "create a continuation",
     "document where we left off",
     "resume from earlier",
-    "what was I working on"
+    "what was I working on",
+    "/continue-later-fast",
+    "quick save",
+    "just dump the context"
   ],
   "documentation": {
     "main": "SKILL.md",
-    "example": "examples/continuation-example.md"
+    "example": "examples/continuation-example.md",
+    "continueLaterFast": "skills/continue-later-fast/SKILL.md"
   },
   "features": [
     "Generate continuation.md from project context",
@@ -43,7 +47,8 @@
     "Resume from existing continuation files",
     "Section extraction for quick lookups",
     "Git-friendly versioning",
-    "No external dependencies"
+    "No external dependencies",
+    "Optional continue-later-fast: raw git dump to continuation.md with no LLM summary (see skills/continue-later-fast/)"
   ],
   "useCases": [
     "Team handoffs and transitions",
