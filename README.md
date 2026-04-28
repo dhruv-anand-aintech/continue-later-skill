@@ -33,15 +33,23 @@ Restart Cursor (or reload the window) after installing.
 
 ### Continue later fast (CLI script)
 
-Dump raw git state to `continuation.md` **without installing skills** — run **from your project root** (the script resolves to the git repository root when inside a repo):
+Requires `bash`, `git`, `python3`, and—**for transcript excerpts**—both [`scripts/continue-later-fast.sh`](scripts/continue-later-fast.sh) and [`scripts/session_recent_user_messages.py`](scripts/session_recent_user_messages.py) (clone the repo or download both files into the same directory).
+
+**Git-only** (single-file curl — no recent user messages):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/scripts/continue-later-fast.sh | bash
 ```
 
-Requires `bash`, `git`, `curl`. Same output shape as [skills/continue-later-fast/SKILL.md](skills/continue-later-fast/SKILL.md).
+**Git + last user prompts from Claude Code / Cursor JSONL** (session id = transcript filename stem under `~/.claude/projects` or `~/.cursor/projects`, see skill doc):
 
-If you already cloned this repo, run `./scripts/continue-later-fast.sh` from any directory inside the working tree (it `cd`s to the git root when `.git` exists).
+```bash
+./scripts/continue-later-fast.sh --agent "<SESSION_OR_AGENT_UUID>" -n 12
+```
+
+Optional: `--jsonl /path/to/session.jsonl`, `--from-cwd` (newest Claude session file mentioning the current directory), or env `CONTINUE_LATER_AGENT`, `CONTINUE_LATER_FROM_CWD=1`.
+
+Discovery follows the same `~/.claude/projects/**/*.jsonl` layout tools such as **claude-session-viewer** use; transcripts are JSONL only (no SQLite).
 
 ### Claude Code: hook (programmatic dump before the LLM)
 
