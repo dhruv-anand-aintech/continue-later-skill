@@ -3,26 +3,29 @@
 This runs **before** the model sees your message. When your prompt matches continuation-style phrases, the hook:
 
 1. Archives existing root **`continuation.md`** and **`continuation-fast.md`** when present (timestamped `*.archive.*.md`).
-2. Collects **git log**, **status**, **diff --stat**, and recent changed paths.
+2. Runs **[`scripts/git-context-dump.sh`](../scripts/git-context-dump.sh)** (`hook-block` mode)—the same helper **`continue-later-fast.sh` uses—so git snapshot logic is not duplicated.
 3. Injects that block as **`additionalContext`** so the skill can use it immediately (look for `=== CONTINUATION CONTEXT DUMP` in context) instead of asking the agent to run shell.
 
 ## Install
 
-1. Copy the hook script to your Claude Code hooks directory and make it executable:
+1. Copy **two** scripts into your Claude Code hooks directory (the hook invokes **`git-context-dump.sh`** next to itself, or via `GIT_CONTEXT_DUMP_SCRIPT`):
 
    ```bash
    mkdir -p ~/.claude/hooks
-   cp claude-code/hooks/continue-later-dump.sh ~/.claude/hooks/continue-later-dump.sh
-   chmod +x ~/.claude/hooks/continue-later-dump.sh
+   cp claude-code/hooks/continue-later-dump.sh ~/.claude/hooks/
+   cp scripts/git-context-dump.sh ~/.claude/hooks/
+   chmod +x ~/.claude/hooks/continue-later-dump.sh ~/.claude/hooks/git-context-dump.sh
    ```
 
-   If you cloned this repo only to grab the file, use the raw URL instead:
+   Raw URLs if not cloning:
 
    ```bash
    mkdir -p ~/.claude/hooks
    curl -fsSL -o ~/.claude/hooks/continue-later-dump.sh \
      https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/claude-code/hooks/continue-later-dump.sh
-   chmod +x ~/.claude/hooks/continue-later-dump.sh
+   curl -fsSL -o ~/.claude/hooks/git-context-dump.sh \
+     https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/scripts/git-context-dump.sh
+   chmod +x ~/.claude/hooks/continue-later-dump.sh ~/.claude/hooks/git-context-dump.sh
    ```
 
 2. Merge **`settings.hooks.example.json`** into **`~/.claude/settings.json`**: add the `hooks` key from the example, or nest `UserPromptSubmit` under your existing `"hooks"` object if you already use hooks. For a first-time `hooks` section, you can paste the example file contents at the top level of `settings.json` (only if you do not already have a `hooks` key—otherwise merge manually to avoid overwriting `Notification` or other hook types).

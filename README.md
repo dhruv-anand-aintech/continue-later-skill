@@ -33,7 +33,7 @@ Restart Cursor (or reload the window) after installing.
 
 ### Continue later fast (CLI script)
 
-Requires `bash`, `git`, `python3`, and—**for transcript excerpts**—both [`scripts/continue-later-fast.sh`](scripts/continue-later-fast.sh) and [`scripts/session_recent_user_messages.py`](scripts/session_recent_user_messages.py) (clone the repo or download both files into the same directory).
+Requires `bash`, `git`, `python3`, [`scripts/git-context-dump.sh`](scripts/git-context-dump.sh) (shared git snapshot—used by **`continue-later-fast.sh`** and the Claude hook), and—**for transcript excerpts**—[`scripts/session_recent_user_messages.py`](scripts/session_recent_user_messages.py). Clone the repo or download the needed files into the same directory.
 
 **Git-only** (single-file curl — no recent user messages):
 

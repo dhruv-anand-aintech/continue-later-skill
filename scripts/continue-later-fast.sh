@@ -102,24 +102,7 @@ elif [[ "$FROM_CWD" == "1" ]]; then
 fi
 
 {
-  echo "# Continuation: $(basename "$(pwd)")"
-  echo ""
-  echo "**Date:** $(date)"
-  echo "**Working directory:** $(pwd)"
-  echo ""
-  echo "## Raw Context Dump"
-  echo ""
-  echo "### git log (last 10)"
-  git log --oneline -10 2>/dev/null || echo "not a git repo"
-  echo ""
-  echo "### git status"
-  git status --short 2>/dev/null
-  echo ""
-  echo "### git diff --stat HEAD"
-  git diff --stat HEAD 2>/dev/null
-  echo ""
-  echo "### recently changed files"
-  git diff HEAD --name-only 2>/dev/null | head -20
+  "$SCRIPT_DIR/git-context-dump.sh" markdown-full
   if [[ ${#PY_ARGS[@]} -gt 0 ]]; then
     echo ""
     if [[ ! -f "$PY" ]]; then

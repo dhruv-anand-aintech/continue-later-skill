@@ -1,12 +1,33 @@
 #!/usr/bin/env bash
-# Claude Code UserPromptSubmit hook: runs *before* the LLM sees the prompt.
-# On continuation-style messages, archives any existing continuation.md and/or
-# continuation-fast.md, runs a
-# programmatic git dump, and injects it as additionalContext (see skills).
+# Claude Code UserPromptSubmit hook: runs *before* the LLM sees your prompt.
+# On continuation-style messages, archives continuation.md / continuation-fast.md,
+# injects git snapshot via scripts/git-context-dump.sh hook-block (single source of truth).
 #
-# Install: copy to ~/.claude/hooks/continue-later-dump.sh, chmod +x, and merge
-#          claude-code/settings.hooks.example.json into ~/.claude/settings.json
-#          (see claude-code/README.md).
+# Install: copy this file next to git-context-dump.sh (from scripts/), chmod +x both,
+#          or set GIT_CONTEXT_DUMP_SCRIPT to an absolute path to git-context-dump.sh.
+# Merge claude-code/settings.hooks.example.json into ~/.claude/settings.json.
+
+set -eu
+
+_resolve_git_dump_helper() {
+  local h="${GIT_CONTEXT_DUMP_SCRIPT:-}"
+  if [[ -n "$h" && -f "$h" ]]; then
+    printf '%s' "$h"
+    return 0
+  fi
+  local hook_dir
+  hook_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [[ -f "${hook_dir}/git-context-dump.sh" ]]; then
+    printf '%s' "${hook_dir}/git-context-dump.sh"
+    return 0
+  fi
+  # Repo checkout: claude-code/hooks → ../../scripts
+  if [[ -f "${hook_dir}/../../scripts/git-context-dump.sh" ]]; then
+    printf '%s' "$(cd "${hook_dir}/../../scripts" && pwd)/git-context-dump.sh"
+    return 0
+  fi
+  echo ""
+}
 
 PROMPT=$(python3 -c "import sys, json; d=json.load(sys.stdin); print(d.get('message','').lower())" 2>/dev/null || echo "")
 
@@ -23,27 +44,14 @@ if echo "$PROMPT" | grep -qE 'continue.later|continue later|save.state|save stat
     ARCHIVED_MSG="${ARCHIVED_MSG:+${ARCHIVED_MSG}; }Archived previous continuation-fast.md → ${ARCHIVE_FAST}"
   fi
 
-  DUMP=$(cat << DUMPEOF
-=== CONTINUATION CONTEXT DUMP (auto-generated before skill) ===
-Date: $(date)
-Directory: $(pwd)
+  HELPER="$(_resolve_git_dump_helper)"
+  if [[ -z "$HELPER" || ! -f "$HELPER" ]]; then
+    echo "continue-later-dump.sh: install scripts/git-context-dump.sh beside this hook or set GIT_CONTEXT_DUMP_SCRIPT" >&2
+    exit 0
+  fi
 
---- git log (last 10) ---
-$(git log --oneline -10 2>/dev/null || echo "not a git repo")
-
---- git status ---
-$(git status --short 2>/dev/null || echo "not a git repo")
-
---- git diff --stat HEAD ---
-$(git diff --stat HEAD 2>/dev/null || echo "no diff")
-
---- recently changed files ---
-$(git diff HEAD --name-only 2>/dev/null | head -20 || echo "none")
-
-${ARCHIVED_MSG}
-=== END DUMP ===
-DUMPEOF
-)
+  export ARCHIVED_MSG
+  DUMP=$("$HELPER" hook-block)
 
   export CONTINUATION_DUMP="$DUMP"
   python3 << 'PYEOF'

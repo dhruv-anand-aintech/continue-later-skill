@@ -82,30 +82,13 @@ export CONTINUE_LATER_AGENT="<TRANSCRIPT_OR_SESSION_ID>"
 
 Transcript parsing is implemented in [`scripts/session_recent_user_messages.py`](https://github.com/dhruv-anand-aintech/continue-later-skill/blob/main/scripts/session_recent_user_messages.py) (JSONL only; no separate DB).
 
-### 3 — If you cannot run the script (fallback: git only)
+### 3 — If you cannot run the full wrapper (fallback: git snapshot only)
+
+Git snapshot text lives in **one place**: [`scripts/git-context-dump.sh`](https://github.com/dhruv-anand-aintech/continue-later-skill/blob/main/scripts/git-context-dump.sh). **`continue-later-fast.sh`** and the Claude **`continue-later-dump`** hook both call it—do not duplicate `git log` / `git status` / `diff` blocks elsewhere.
 
 ```bash
-{
-  echo "# Continuation: $(basename $(pwd))"
-  echo ""
-  echo "**Date:** $(date)"
-  echo "**Working directory:** $(pwd)"
-  echo ""
-  echo "## Raw Context Dump"
-  echo ""
-  echo "### git log (last 10)"
-  git log --oneline -10 2>/dev/null || echo "not a git repo"
-  echo ""
-  echo "### git status"
-  git status --short 2>/dev/null
-  echo ""
-  echo "### git diff --stat HEAD"
-  git diff --stat HEAD 2>/dev/null
-  echo ""
-  echo "### recently changed files"
-  git diff HEAD --name-only 2>/dev/null | head -20
-} > continuation.md
-echo "Written: continuation.md"
+scripts/git-context-dump.sh markdown-full > continuation-fast.md
+echo "Written: continuation-fast.md"
 ```
 
 ### 4 — Done
