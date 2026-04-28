@@ -8,7 +8,9 @@ This runs **before** the model sees your message. When your prompt matches conti
 
 ## Install
 
-1. Copy **two** scripts into your Claude Code hooks directory (the hook invokes **`git-context-dump.sh`** next to itself, or via `GIT_CONTEXT_DUMP_SCRIPT`):
+1. Copy **`continue-later-dump.sh`** into your Claude Code hooks directory. The hook resolves **`git-context-dump.sh`** in this order: **`GIT_CONTEXT_DUMP_SCRIPT`**, **`${CONTINUE_LATER_CLI_DIR:-~/.config/continue-later}/git-context-dump.sh`** (after **`install.sh`** from this repo), sibling of the hook, then a repo checkout’s **`scripts/`** path.
+
+   Typical install (also copies **`git-context-dump.sh`** beside the hook):
 
    ```bash
    mkdir -p ~/.claude/hooks
