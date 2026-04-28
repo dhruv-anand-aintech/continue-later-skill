@@ -31,6 +31,10 @@ curl -fsSL "https://raw.githubusercontent.com/<fork-owner>/continue-later-skill/
 
 Restart Cursor (or reload the window) after installing.
 
+### Claude Code: hook (programmatic dump before the LLM)
+
+If you use **Claude Code**, you can install a **`UserPromptSubmit`** hook that archives `continuation.md`, runs the git dump, and injects **`=== CONTINUATION CONTEXT DUMP`** into context so the agent does not need to shell out first. See **[claude-code/README.md](claude-code/README.md)** and **[claude-code/hooks/continue-later-dump.sh](claude-code/hooks/continue-later-dump.sh)**.
+
 ## What gets installed
 
 | Skill folder | Role |

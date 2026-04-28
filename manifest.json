@@ -41,14 +41,16 @@
     "example": "examples/continuation-example.md",
     "continueLaterFast": "skills/continue-later-fast/SKILL.md",
     "resumeContinuation": "skills/resume-continuation/SKILL.md",
-    "install": "install.sh"
+    "install": "install.sh",
+    "claudeCodeHook": "claude-code/README.md"
   },
   "features": [
     "One-command install via install.sh into ~/.cursor/skills",
     "continue-later: structured continuation.md",
     "continue-later-fast: raw git dump only",
     "resume-continuation: summarize existing continuation.md",
-    "No marketplace, no npm—curl and bash only"
+    "No marketplace, no npm—curl and bash only",
+    "Optional Claude Code UserPromptSubmit hook (claude-code/) injects git dump before the LLM"
   ],
   "useCases": [
     "Team handoffs and transitions",

@@ -25,7 +25,7 @@ Fastest possible handoff: archive existing `continuation.md`, run the git dump s
 
 ### 2 — Check for pre-injected dump
 
-Look for `=== CONTINUATION CONTEXT DUMP` in your context (injected by the Claude Code `UserPromptSubmit` hook).
+Look for `=== CONTINUATION CONTEXT DUMP` in your context (injected by the Claude Code `UserPromptSubmit` hook—see `claude-code/hooks/continue-later-dump.sh` in the [continue-later-skill](https://github.com/dhruv-anand-aintech/continue-later-skill) repo).
 
 - **If present:** use it as the content. Skip the tool call below.
 - **If absent:** run this via Bash tool:

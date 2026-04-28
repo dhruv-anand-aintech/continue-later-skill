@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/continue-later-dump.sh",
+            "timeout": 10,
+            "statusMessage": "Dumping git context…"
+          }
+        ]
+      }
+    ]
+  }
+}
