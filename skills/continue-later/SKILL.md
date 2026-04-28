@@ -88,6 +88,7 @@ Description of what went wrong.
 
 ## Rules for Generating Continuations
 
+0. **Archive existing handoffs before writing.** If **`continuation.md`** and/or **`continuation-fast.md`** exist in the project root, move each to **`continuation.archive.YYYYMMDD_HHMMSS.md`** / **`continuation-fast.archive.YYYYMMDD_HHMMSS.md`** (same pattern as **`continue-later-fast`** and **`claude-code/hooks/continue-later-dump.sh`**), then write the new **`continuation.md`**.
 1. **Be specific, not vague.** "Fixed the regex to match AM/PM filenames" beats "fixed the filename bug".
 2. **State the exact current state.** If the DB has 0 rows, say so. Don't paper over partial states.
 3. **Pending tasks verbatim.** Copy the user's unmet requests word-for-word—don't paraphrase.

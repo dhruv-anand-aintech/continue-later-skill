@@ -1,96 +1,44 @@
 ---
 name: continue-later-fast
-description: Use for a quick no-LLM dump to continuation-fast.md—raw git state plus optional last user messages from Claude Code / Cursor JSONL transcripts when you pass --agent SESSION_ID. Runs scripts/continue-later-fast.sh (or hook-injected dump), archives any existing continuation-fast.md.
+description: Run continue-later-fast from PATH (installed to ~/.local/bin by install.sh) from the project git root, or ~/.config/continue-later/continue-later-fast.sh. Writes continuation-fast.md (git + recent prompts). No LLM summary.
 ---
 
 # Continue Later Fast
 
-## Overview
+## Do this
 
-Archive any existing **`continuation-fast.md`**, dump **raw git context** to **`continuation-fast.md`**, and optionally append the **last few human-authored user prompts** from the local transcript (same JSONL layout under `~/.claude/projects/` as described in community tooling such as **claude-session-viewer**, plus Cursor `~/.cursor/projects/**/agent-transcripts/**/*.jsonl`). Does **not** overwrite **`continuation.md`** (structured handoff from **continue-later**). No LLM synthesis in the file itself.
-
-## When to Use
-
-- User says "/continue-later-fast" or "quick save" or "just dump the context"
-- You want raw context, optionally with **recent conversation text** from disk
-- As a sub-step before running the full **continue-later** skill
-
-## Pass the transcript / agent id
-
-| Product | What to pass as `--agent` | Where it lives |
-|--------|---------------------------|----------------|
-| **Claude Code** | Session UUID (same as the `.jsonl` basename) | `~/.claude/projects/<encoded-project>/<SESSION>.jsonl` |
-| **Claude Code subagent** | Subagent file stem (e.g. `agent-a865d3008b337f458`) | `.../<session>/subagents/<stem>.jsonl` |
-| **Cursor agent** | Agent transcript UUID (folder name under `agent-transcripts`) | `~/.cursor/projects/.../agent-transcripts/<UUID>/<UUID>.jsonl` |
-
-Discovery scans **`**/<ID>.jsonl`** under `~/.claude/projects` and `~/.cursor/projects` and picks the **newest by mtime** if duplicates exist.
-
-When calling from **this chat**, pass the **current agent/session transcript id** as `--agent` (or `CONTINUE_LATER_AGENT`). That ties the dump to the conversation from which the skill runs.
-
-## Steps
-
-### 1 — Archive existing continuation-fast.md
+After **`curl … | bash install`** (see repo README), the CLI bundle lives in **`${XDG_CONFIG_HOME:-~/.config}/continue-later/`** and a **`continue-later-fast`** symlink is added under **`${CONTINUE_LATER_BIN_DIR:-~/.local/bin}`** (ensure that directory is on `PATH`). From **any directory**, `cd` to the **git repository root** of the project being handed off, then run:
 
 ```bash
-[ -f continuation-fast.md ] && mv continuation-fast.md continuation-fast.archive.$(date +%Y%m%d_%H%M%S).md
+continue-later-fast -n 12
 ```
 
-### 2 — Prefer programmatic paths (hook or CLI)
-
-**A — Claude Code hook already injected context**
-
-Look for `=== CONTINUATION CONTEXT DUMP` (see `claude-code/hooks/continue-later-dump.sh`). If present, you still may append transcript excerpts via the script below.
-
-**B — Run the repo script (recommended)**
-
-From the **git repo root** (or `cd` there first):
+Equivalent paths (no PATH needed):
 
 ```bash
-scripts/continue-later-fast.sh --agent "<TRANSCRIPT_OR_SESSION_ID>" -n 12
+"${XDG_CONFIG_HOME:-$HOME/.config}/continue-later/continue-later-fast.sh" -n 12
 ```
 
-Or one-shot download (downloads **only** the shell script—you still need `session_recent_user_messages.py` beside it for transcript support, so prefer a clone or copy **both** files from `scripts/`):
+That script archives prior `continuation.md` / `continuation-fast.md`, writes **`continuation-fast.md`**, and appends recent user messages (newest local `*.jsonl` by mtime by default).
 
-```bash
-# Minimal git-only dump (no transcript helper):
-curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/scripts/continue-later-fast.sh | bash
+**Developing in a clone of this repo** you can run **`./scripts/continue-later-fast.sh`** instead (same behavior; helpers must stay beside the wrapper).
 
-# Full clone (transcript extraction):
-git clone https://github.com/dhruv-anand-aintech/continue-later-skill.git && \
-  cd continue-later-skill && ./scripts/continue-later-fast.sh --agent "<ID>"
-```
+**Do not** hand-roll inline `git log` / `status` / `diff` into `continuation.md` when the installed script exists.
 
-Environment equivalent:
+## Optional
 
-```bash
-export CONTINUE_LATER_AGENT="<TRANSCRIPT_OR_SESSION_ID>"
-./scripts/continue-later-fast.sh
-```
+| Flag / env | Purpose |
+|------------|---------|
+| `--agent <id>` / `CONTINUE_LATER_AGENT` | Pin a specific session JSONL |
+| `--skip-transcript` / `CONTINUE_LATER_SKIP_TRANSCRIPT=1` | Git snapshot only |
+| `--from-cwd` / `CONTINUE_LATER_FROM_CWD=1` | Prefer Claude transcript mentioning `$PWD`; else newest mtime |
+| `-n` / `CONTINUE_LATER_LIMIT` | Max prompts (default 12) |
+| `CONTINUE_LATER_CLI_DIR` / `CONTINUE_LATER_BIN_DIR` | Installer overrides for custom install locations |
 
-**C — Explicit JSONL path**
+**Claude Code:** If `=== CONTINUATION CONTEXT DUMP … ===` is already injected by the hook, you may still run **`continue-later-fast`** once to persist **`continuation-fast.md`** on disk.
 
-```bash
-./scripts/continue-later-fast.sh --jsonl ~/.claude/projects/-Users-you-Code-foo/bar.jsonl
-```
+See repo **README.md** for install and fork options.
 
-**D — Heuristic: newest Claude session mentioning cwd**
+## When to use
 
-```bash
-./scripts/continue-later-fast.sh --from-cwd
-# or: CONTINUE_LATER_FROM_CWD=1 ./scripts/continue-later-fast.sh
-```
-
-Transcript parsing is implemented in [`scripts/session_recent_user_messages.py`](https://github.com/dhruv-anand-aintech/continue-later-skill/blob/main/scripts/session_recent_user_messages.py) (JSONL only; no separate DB).
-
-### 3 — If you cannot run the full wrapper (fallback: git snapshot only)
-
-Git snapshot text lives in **one place**: [`scripts/git-context-dump.sh`](https://github.com/dhruv-anand-aintech/continue-later-skill/blob/main/scripts/git-context-dump.sh). **`continue-later-fast.sh`** and the Claude **`continue-later-dump`** hook both call it—do not duplicate `git log` / `git status` / `diff` blocks elsewhere.
-
-```bash
-scripts/git-context-dump.sh markdown-full > continuation-fast.md
-echo "Written: continuation-fast.md"
-```
-
-### 4 — Done
-
-The output **`continuation-fast.md`** holds **git ground truth** and, when you used `--agent` / `--jsonl` / `--from-cwd`, a **Recent user messages** section. For a structured **`continuation.md`**, run **continue-later** (resume reads either file—see **resume-continuation**).
+`/continue-later-fast`, `quick save`, `just dump the context`—or as a fast step before **continue-later** for a structured `continuation.md`.
