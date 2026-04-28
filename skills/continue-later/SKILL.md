@@ -17,7 +17,7 @@ When the user asks to hand off work, save state, or create a continuation, gener
 - "Document where we left off"
 - "I'm done for the day, create handoff docs"
 
-For summarizing an existing `continuation.md`, use the **resume-continuation** skill. For a raw git-only dump with no narrative, use **continue-later-fast**.
+For summarizing handoff files, use the **resume-continuation** skill (it reads **`continuation.md`** and/or **`continuation-fast.md`**—prefer structured `continuation.md` when both exist). For a raw git-focused dump, use **continue-later-fast** (writes **`continuation-fast.md`**).
 
 ## Continuation.md Structure
 

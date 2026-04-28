@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Raw git dump to continuation.md (no LLM). Optionally append recent human user
+# Raw git dump to continuation-fast.md (no LLM). Optionally append recent human user
 # prompts from Claude Code / Cursor JSONL transcripts (same layout as
 # claude-session-viewer: ~/.claude/projects/**/<session>.jsonl).
 #
@@ -23,7 +23,7 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") [options] [agent-id]
 
-Write continuation.md with git context and (when transcript args are given)
+Write continuation-fast.md with git context and (when transcript args are given)
 recent human user prompts from local JSONL sessions.
 
 Options:
@@ -37,6 +37,7 @@ Options:
 Environment:
   CONTINUE_LATER_AGENT, CONTINUE_LATER_LIMIT, CONTINUE_LATER_JSONL,
   CONTINUE_LATER_FROM_CWD=1 (same as --from-cwd)
+  CONTINUE_LATER_FAST_FILE — override output filename (default continuation-fast.md)
 
 Examples:
   $(basename "$0") --agent 7b252952-7b76-4ae4-ad55-9db805a8e546
@@ -85,8 +86,10 @@ done
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
-if [[ -f continuation.md ]]; then
-  mv continuation.md "continuation.archive.$(date +%Y%m%d_%H%M%S).md"
+OUT="${CONTINUE_LATER_FAST_FILE:-continuation-fast.md}"
+
+if [[ -f "$OUT" ]]; then
+  mv "$OUT" "continuation-fast.archive.$(date +%Y%m%d_%H%M%S).md"
 fi
 
 PY_ARGS=()
@@ -126,6 +129,6 @@ fi
       python3 "$PY" "${PY_ARGS[@]}" --limit "$LIMIT" || true
     fi
   fi
-} > continuation.md
+} > "$OUT"
 
-echo "Written: continuation.md"
+echo "Written: $OUT"

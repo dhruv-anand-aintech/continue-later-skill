@@ -2,7 +2,7 @@
 
 This runs **before** the model sees your message. When your prompt matches continuation-style phrases, the hook:
 
-1. Archives an existing root `continuation.md` (timestamped `continuation.archive.*.md`).
+1. Archives existing root **`continuation.md`** and **`continuation-fast.md`** when present (timestamped `*.archive.*.md`).
 2. Collects **git log**, **status**, **diff --stat**, and recent changed paths.
 3. Injects that block as **`additionalContext`** so the skill can use it immediately (look for `=== CONTINUATION CONTEXT DUMP` in context) instead of asking the agent to run shell.
 

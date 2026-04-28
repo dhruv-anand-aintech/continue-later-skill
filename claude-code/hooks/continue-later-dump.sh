@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Claude Code UserPromptSubmit hook: runs *before* the LLM sees the prompt.
-# On continuation-style messages, archives any existing continuation.md, runs a
+# On continuation-style messages, archives any existing continuation.md and/or
+# continuation-fast.md, runs a
 # programmatic git dump, and injects it as additionalContext (see skills).
 #
 # Install: copy to ~/.claude/hooks/continue-later-dump.sh, chmod +x, and merge
@@ -15,6 +16,11 @@ if echo "$PROMPT" | grep -qE 'continue.later|continue later|save.state|save stat
     ARCHIVE="continuation.archive.$(date +%Y%m%d_%H%M%S).md"
     mv "continuation.md" "$ARCHIVE"
     ARCHIVED_MSG="Archived previous continuation.md → ${ARCHIVE}"
+  fi
+  if [[ -f "continuation-fast.md" ]]; then
+    ARCHIVE_FAST="continuation-fast.archive.$(date +%Y%m%d_%H%M%S).md"
+    mv "continuation-fast.md" "$ARCHIVE_FAST"
+    ARCHIVED_MSG="${ARCHIVED_MSG:+${ARCHIVED_MSG}; }Archived previous continuation-fast.md → ${ARCHIVE_FAST}"
   fi
 
   DUMP=$(cat << DUMPEOF

@@ -49,8 +49,8 @@
   "features": [
     "One-command install via install.sh into ~/.cursor/skills",
     "continue-later: structured continuation.md",
-    "continue-later-fast: raw git dump only",
-    "resume-continuation: summarize existing continuation.md",
+    "continue-later-fast: raw git dump to continuation-fast.md",
+    "resume-continuation: summarize continuation.md or continuation-fast.md",
     "No marketplace, no npm—curl and bash only",
     "Optional Claude Code UserPromptSubmit hook (claude-code/) injects git dump before the LLM",
     "scripts/continue-later-fast.sh — curl | bash CLI with no skill install",

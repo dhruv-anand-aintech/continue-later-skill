@@ -1,13 +1,13 @@
 ---
 name: continue-later-fast
-description: Use for a quick no-LLM dump to continuation.md—raw git state plus optional last user messages from Claude Code / Cursor JSONL transcripts when you pass --agent SESSION_ID. Runs scripts/continue-later-fast.sh (or hook-injected dump), archives any existing continuation.md.
+description: Use for a quick no-LLM dump to continuation-fast.md—raw git state plus optional last user messages from Claude Code / Cursor JSONL transcripts when you pass --agent SESSION_ID. Runs scripts/continue-later-fast.sh (or hook-injected dump), archives any existing continuation-fast.md.
 ---
 
 # Continue Later Fast
 
 ## Overview
 
-Archive any existing `continuation.md`, dump **raw git context** to `continuation.md`, and optionally append the **last few human-authored user prompts** from the local transcript (same JSONL layout under `~/.claude/projects/` as described in community tooling such as **claude-session-viewer**, plus Cursor `~/.cursor/projects/**/agent-transcripts/**/*.jsonl`). No LLM synthesis in the file itself.
+Archive any existing **`continuation-fast.md`**, dump **raw git context** to **`continuation-fast.md`**, and optionally append the **last few human-authored user prompts** from the local transcript (same JSONL layout under `~/.claude/projects/` as described in community tooling such as **claude-session-viewer**, plus Cursor `~/.cursor/projects/**/agent-transcripts/**/*.jsonl`). Does **not** overwrite **`continuation.md`** (structured handoff from **continue-later**). No LLM synthesis in the file itself.
 
 ## When to Use
 
@@ -29,10 +29,10 @@ When calling from **this chat**, pass the **current agent/session transcript id*
 
 ## Steps
 
-### 1 — Archive existing continuation.md
+### 1 — Archive existing continuation-fast.md
 
 ```bash
-[ -f continuation.md ] && mv continuation.md continuation.archive.$(date +%Y%m%d_%H%M%S).md
+[ -f continuation-fast.md ] && mv continuation-fast.md continuation-fast.archive.$(date +%Y%m%d_%H%M%S).md
 ```
 
 ### 2 — Prefer programmatic paths (hook or CLI)
@@ -110,4 +110,4 @@ echo "Written: continuation.md"
 
 ### 4 — Done
 
-The file holds **git ground truth** and, when you used `--agent` / `--jsonl` / `--from-cwd`, a **Recent user messages** section. A follow-up **continue-later** run can add a structured narrative.
+The output **`continuation-fast.md`** holds **git ground truth** and, when you used `--agent` / `--jsonl` / `--from-cwd`, a **Recent user messages** section. For a structured **`continuation.md`**, run **continue-later** (resume reads either file—see **resume-continuation**).

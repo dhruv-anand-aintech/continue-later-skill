@@ -1,6 +1,6 @@
 # Continue Later Skills
 
-Cursor skills for **structured handoffs** (`continuation.md`), **quick raw git dumps**, and **resuming** from an existing continuation—without a marketplace or npm.
+Cursor skills for **structured handoffs** (`continuation.md`), **quick raw dumps** (`continuation-fast.md`), and **resuming** from whichever handoff file exists—without a marketplace or npm.
 
 ## Install (one command)
 
@@ -41,27 +41,27 @@ Requires `bash`, `git`, `python3`, and—**for transcript excerpts**—both [`sc
 curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/scripts/continue-later-fast.sh | bash
 ```
 
-**Git + last user prompts from Claude Code / Cursor JSONL** (session id = transcript filename stem under `~/.claude/projects` or `~/.cursor/projects`, see skill doc):
+**Git + last user prompts from Claude Code / Cursor JSONL** — writes **`continuation-fast.md`** (session id = transcript filename stem under `~/.claude/projects` or `~/.cursor/projects`, see skill doc):
 
 ```bash
 ./scripts/continue-later-fast.sh --agent "<SESSION_OR_AGENT_UUID>" -n 12
 ```
 
-Optional: `--jsonl /path/to/session.jsonl`, `--from-cwd` (newest Claude session file mentioning the current directory), or env `CONTINUE_LATER_AGENT`, `CONTINUE_LATER_FROM_CWD=1`.
+Optional: `--jsonl /path/to/session.jsonl`, `--from-cwd` (newest Claude session file mentioning the current directory), env `CONTINUE_LATER_AGENT`, `CONTINUE_LATER_FROM_CWD=1`, or **`CONTINUE_LATER_FAST_FILE`** to override the output path.
 
 Discovery follows the same `~/.claude/projects/**/*.jsonl` layout tools such as **claude-session-viewer** use; transcripts are JSONL only (no SQLite).
 
 ### Claude Code: hook (programmatic dump before the LLM)
 
-If you use **Claude Code**, you can install a **`UserPromptSubmit`** hook that archives `continuation.md`, runs the git dump, and injects **`=== CONTINUATION CONTEXT DUMP`** into context so the agent does not need to shell out first. See **[claude-code/README.md](claude-code/README.md)** and **[claude-code/hooks/continue-later-dump.sh](claude-code/hooks/continue-later-dump.sh)**.
+If you use **Claude Code**, you can install a **`UserPromptSubmit`** hook that archives **`continuation.md`** / **`continuation-fast.md`** when present, runs the git dump, and injects **`=== CONTINUATION CONTEXT DUMP`** into context so the agent does not need to shell out first. See **[claude-code/README.md](claude-code/README.md)** and **[claude-code/hooks/continue-later-dump.sh](claude-code/hooks/continue-later-dump.sh)**.
 
 ## What gets installed
 
 | Skill folder | Role |
 |----------------|------|
 | `continue-later` | Full structured `continuation.md` (overview, stack, state, tasks, gotchas, deploy). |
-| `continue-later-fast` | Archive existing file, dump raw git context into `continuation.md`—no narrative summary. |
-| `resume-continuation` | Read and summarize existing `continuation.md` (“resume from earlier”, pending tasks, gotchas). |
+| `continue-later-fast` | Archive existing file, dump raw git context into **`continuation-fast.md`**—no narrative summary. |
+| `resume-continuation` | Read **`continuation.md`** and/or **`continuation-fast.md`** (prefer structured file when both exist). |
 
 Source files in this repo: [skills/continue-later/](skills/continue-later/), [skills/continue-later-fast/](skills/continue-later-fast/), [skills/resume-continuation/](skills/resume-continuation/).
 
