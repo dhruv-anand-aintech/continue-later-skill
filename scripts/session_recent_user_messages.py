@@ -139,6 +139,33 @@ def discover_by_cwd(cwd: str) -> Optional[Path]:
     return max(candidates, key=lambda x: x[0])[1]
 
 
+def discover_latest_transcript() -> Optional[Path]:
+    """
+    Pick the transcript `.jsonl` with the newest `st_mtime` under local Claude Code and
+    Cursor project trees. Mirrors "most recently written to" session = active thread heuristic.
+    """
+    home = Path.home()
+    candidates: list[tuple[float, Path]] = []
+    for base in (home / ".cursor/projects", home / ".claude/projects"):
+        if not base.is_dir():
+            continue
+        for p in base.rglob("*.jsonl"):
+            try:
+                candidates.append((p.stat().st_mtime, p.resolve()))
+            except OSError:
+                continue
+    if not candidates:
+        return None
+    return max(candidates, key=lambda x: x[0])[1]
+
+
+def pick_latest_transcript_logged() -> Optional[Path]:
+    path = discover_latest_transcript()
+    if path is not None:
+        print(f"(using newest transcript by mtime: {path})", file=sys.stderr)
+    return path
+
+
 def format_section(
     jsonl_path: Path, items: list[tuple[int, str]], limit: int
 ) -> str:
@@ -181,7 +208,7 @@ def main() -> int:
     ap.add_argument(
         "--from-cwd",
         action="store_true",
-        help="If --agent/--jsonl missing, pick the newest Claude session file under ~/.claude/projects that mentions the given --cwd in the first 256 KiB.",
+        help="Prefer the newest Claude session under ~/.claude/projects whose first 256 KiB mention --cwd; if none match, fall back to --latest.",
     )
     ap.add_argument(
         "--cwd",
@@ -189,7 +216,15 @@ def main() -> int:
         type=Path,
         help="Working tree for --from-cwd (default: git root or current directory).",
     )
+    ap.add_argument(
+        "--skip-latest",
+        action="store_true",
+        help="Do not append a transcript section (git-only; for automation).",
+    )
     args = ap.parse_args()
+
+    if args.skip_latest or os.environ.get("CONTINUE_LATER_SKIP_TRANSCRIPT") == "1":
+        return 0
 
     jsonl: Optional[Path] = None
     if args.jsonl:
@@ -210,11 +245,18 @@ def main() -> int:
         jsonl = discover_by_cwd(str(cwd))
         if jsonl is None:
             print(
-                "(no Claude Code transcript matched cwd — skipping conversation section)",
+                "(no Claude Code transcript matched cwd — trying newest transcript by mtime)",
                 file=sys.stderr,
             )
-            return 0
+            jsonl = pick_latest_transcript_logged()
     else:
+        jsonl = pick_latest_transcript_logged()
+
+    if jsonl is None:
+        print(
+            "(no local Claude/Cursor *.jsonl transcripts found — skipping conversation section)",
+            file=sys.stderr,
+        )
         return 0
 
     limit = max(1, args.limit)

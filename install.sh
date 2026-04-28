@@ -14,6 +14,10 @@
 #   • If none of the above homes exist, ~/.cursor/skills is created and used.
 #
 # Usage: curl -fsSL …/install.sh | bash
+#
+# Always installs the fast CLI bundle into CONTINUE_LATER_CLI_DIR (default:
+# ~/.config/continue-later/) and symlinks CONTINUE_LATER_BIN_DIR/continue-later-fast → …/continue-later-fast.sh
+# so the command works from any directory inside a git repo.
 set -euo pipefail
 
 OWNER_REPO="${CONTINUE_LATER_SKILLS_REPO:-dhruv-anand-aintech/continue-later-skill}"
@@ -63,6 +67,14 @@ if [[ ! -d "${SKILLS_SRC}/continue-later" ]]; then
   echo "error: expected skills bundle not found in archive (missing ${SKILLS_SRC}/continue-later)." >&2
   exit 1
 fi
+
+SCRIPTS_SRC="${TOP}/scripts"
+for _need in continue-later-fast.sh git-context-dump.sh session_recent_user_messages.py; do
+  if [[ ! -f "${SCRIPTS_SRC}/${_need}" ]]; then
+    echo "error: missing ${SCRIPTS_SRC}/${_need}" >&2
+    exit 1
+  fi
+done
 
 DESTINATIONS=()
 if [[ -n "${AGENT_SKILLS_DIRS:-}" ]]; then
@@ -115,10 +127,24 @@ for DEST in "${DESTINATIONS[@]}"; do
   done
 done
 
+_XDG_CFG="${XDG_CONFIG_HOME:-${HOME}/.config}"
+CLI_DIR="${CONTINUE_LATER_CLI_DIR:-${_XDG_CFG}/continue-later}"
+mkdir -p "${CLI_DIR}"
+cp "${SCRIPTS_SRC}/continue-later-fast.sh" "${SCRIPTS_SRC}/git-context-dump.sh" "${SCRIPTS_SRC}/session_recent_user_messages.py" "${CLI_DIR}/"
+chmod +x "${CLI_DIR}/continue-later-fast.sh" "${CLI_DIR}/git-context-dump.sh"
+
+BIN_DIR="${CONTINUE_LATER_BIN_DIR:-${HOME}/.local/bin}"
+mkdir -p "${BIN_DIR}"
+ln -sf "${CLI_DIR}/continue-later-fast.sh" "${BIN_DIR}/continue-later-fast"
+
 echo ""
-echo "Installed (${#DESTINATIONS[@]} location(s)):"
+echo "Installed (${#DESTINATIONS[@]} skill location(s)):"
 for DEST in "${DESTINATIONS[@]}"; do
   echo "  ${DEST}/{continue-later,continue-later-fast,resume-continuation}/SKILL.md"
 done
+echo ""
+echo "Fast CLI (run from any git repo root; add ${BIN_DIR} to PATH if needed):"
+echo "  ${CLI_DIR}/{continue-later-fast.sh,git-context-dump.sh,session_recent_user_messages.py}"
+echo "  ${BIN_DIR}/continue-later-fast → continue-later-fast.sh"
 echo ""
 echo "Restart each assistant (Cursor, Claude Code, Antigravity, OpenCode, Codex, …) or reload so skills apply."

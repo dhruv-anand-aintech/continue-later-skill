@@ -15,6 +15,12 @@ _resolve_git_dump_helper() {
     printf '%s' "$h"
     return 0
   fi
+  local xdg_cfg="${XDG_CONFIG_HOME:-${HOME}/.config}"
+  local default_cli="${CONTINUE_LATER_CLI_DIR:-${xdg_cfg}/continue-later}/git-context-dump.sh"
+  if [[ -f "$default_cli" ]]; then
+    printf '%s' "$default_cli"
+    return 0
+  fi
   local hook_dir
   hook_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   if [[ -f "${hook_dir}/git-context-dump.sh" ]]; then
