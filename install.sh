@@ -18,6 +18,10 @@
 # Always installs the fast CLI bundle into CONTINUE_LATER_CLI_DIR (default:
 # ~/.config/continue-later/) and symlinks CONTINUE_LATER_BIN_DIR/continue-later-fast → …/continue-later-fast.sh
 # so the command works from any directory inside a git repo.
+#
+# When CONTINUE_LATER_CURSOR_HOOK is unset or non-zero: installs a Cursor beforeSubmitPrompt hook
+# (~/.cursor/hooks/continue-later-before-submit.sh + merge into ~/.cursor/hooks.json) so
+# continuation-style prompts trigger continue-later-fast on disk. Set CONTINUE_LATER_CURSOR_HOOK=0 to skip.
 set -euo pipefail
 
 OWNER_REPO="${CONTINUE_LATER_SKILLS_REPO:-dhruv-anand-aintech/continue-later-skill}"
@@ -75,6 +79,12 @@ for _need in continue-later-fast.sh git-context-dump.sh session_recent_user_mess
     exit 1
   fi
 done
+
+CURSOR_HOOK_SRC="${TOP}/cursor/hooks/continue-later-before-submit.sh"
+if [[ ! -f "${CURSOR_HOOK_SRC}" ]]; then
+  echo "error: missing ${CURSOR_HOOK_SRC}" >&2
+  exit 1
+fi
 
 DESTINATIONS=()
 if [[ -n "${AGENT_SKILLS_DIRS:-}" ]]; then
@@ -137,6 +147,48 @@ BIN_DIR="${CONTINUE_LATER_BIN_DIR:-${HOME}/.local/bin}"
 mkdir -p "${BIN_DIR}"
 ln -sf "${CLI_DIR}/continue-later-fast.sh" "${BIN_DIR}/continue-later-fast"
 
+if [[ "${CONTINUE_LATER_CURSOR_HOOK:-1}" != "0" ]]; then
+  mkdir -p "${HOME}/.cursor/hooks"
+  cp "${CURSOR_HOOK_SRC}" "${HOME}/.cursor/hooks/continue-later-before-submit.sh"
+  chmod +x "${HOME}/.cursor/hooks/continue-later-before-submit.sh"
+  python3 - "${HOME}/.cursor/hooks.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+hooks_path = Path(sys.argv[1])
+cmd = "./hooks/continue-later-before-submit.sh"
+
+if hooks_path.exists():
+    try:
+        data = json.loads(hooks_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        print(f"error: invalid JSON in {hooks_path}: {e}", file=sys.stderr)
+        sys.exit(1)
+else:
+    data = {"version": 1, "hooks": {}}
+
+if not isinstance(data.get("hooks"), dict):
+    data["hooks"] = {}
+hooks = data["hooks"]
+subs = hooks.get("beforeSubmitPrompt")
+if subs is None:
+    hooks["beforeSubmitPrompt"] = []
+    subs = hooks["beforeSubmitPrompt"]
+elif not isinstance(subs, list):
+    print(f"error: {hooks_path} hooks.beforeSubmitPrompt must be a list", file=sys.stderr)
+    sys.exit(1)
+
+if any(cmd in str(entry.get("command", "")) for entry in subs):
+    print(f"Cursor beforeSubmitPrompt hook already present in {hooks_path}")
+else:
+    subs.append({"command": cmd})
+    data.setdefault("version", 1)
+    hooks_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    print(f"Registered Cursor beforeSubmitPrompt hook in {hooks_path}")
+PY
+fi
+
 echo ""
 echo "Installed (${#DESTINATIONS[@]} skill location(s)):"
 for DEST in "${DESTINATIONS[@]}"; do
@@ -147,4 +199,10 @@ echo "Fast CLI (run from any git repo root; add ${BIN_DIR} to PATH if needed):"
 echo "  ${CLI_DIR}/{continue-later-fast.sh,git-context-dump.sh,session_recent_user_messages.py}"
 echo "  ${BIN_DIR}/continue-later-fast → continue-later-fast.sh"
 echo ""
+if [[ "${CONTINUE_LATER_CURSOR_HOOK:-1}" != "0" ]]; then
+  echo "Cursor hook (beforeSubmitPrompt): ~/.cursor/hooks/continue-later-before-submit.sh"
+  echo "  Continuation-style chat prompts run continue-later-fast in the workspace git root."
+  echo "  Skip with: CONTINUE_LATER_CURSOR_HOOK=0"
+  echo ""
+fi
 echo "Restart each assistant (Cursor, Claude Code, Antigravity, OpenCode, Codex, …) or reload so skills apply."

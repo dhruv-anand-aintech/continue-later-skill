@@ -37,6 +37,8 @@ That script archives prior `continuation.md` / `continuation-fast.md`, writes **
 
 **Claude Code:** If `=== CONTINUATION CONTEXT DUMP … ===` is already injected by the hook, you may still run **`continue-later-fast`** once to persist **`continuation-fast.md`** on disk.
 
+**Cursor:** After **`install.sh`**, a **`beforeSubmitPrompt`** hook runs **`continue-later-fast`** on the same continuation-style phrases so **`continuation-fast.md`** is updated when you send the message (no prompt injection—disk only). Opt out of hook install with **`CONTINUE_LATER_CURSOR_HOOK=0`**.
+
 See repo **README.md** for install and fork options.
 
 ## When to use

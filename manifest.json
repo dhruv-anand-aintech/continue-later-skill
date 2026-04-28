@@ -45,7 +45,8 @@
     "continueLaterFastScript": "scripts/continue-later-fast.sh",
     "sessionRecentUserMessages": "scripts/session_recent_user_messages.py",
     "gitContextDump": "scripts/git-context-dump.sh",
-    "claudeCodeHook": "claude-code/README.md"
+    "claudeCodeHook": "claude-code/README.md",
+    "cursorBeforeSubmitHook": "cursor/hooks/continue-later-before-submit.sh"
   },
   "features": [
     "install.sh discovers Cursor/Claude/Codex/agents/Gemini/OpenCode skill dirs (optional AGENT_SKILLS_DIRS)",
@@ -54,6 +55,7 @@
     "resume-continuation: summarize continuation.md or continuation-fast.md",
     "No marketplace, no npm—curl and bash only",
     "Optional Claude Code UserPromptSubmit hook (claude-code/) injects git dump before the LLM",
+    "install.sh registers Cursor beforeSubmitPrompt hook (~/.cursor/hooks.json) to run continue-later-fast on matching prompts",
     "install.sh installs CLI to ~/.config/continue-later + ~/.local/bin/continue-later-fast symlink (CONTINUE_LATER_CLI_DIR / CONTINUE_LATER_BIN_DIR)",
     "scripts/continue-later-fast.sh — usable from repo scripts/ or ~/.config after install",
     "scripts/session_recent_user_messages.py — Claude/Cursor JSONL recent user prompts",

@@ -20,7 +20,7 @@ continue-later-fast -n 12
 
 Without the installer, see [README.md](README.md) for `curl` bundles or use **`./scripts/continue-later-fast.sh`** from a repo clone. Defaults to the **newest local transcript by mtime** unless you pass **`--agent`**.
 
-Env: `CONTINUE_LATER_AGENT`, `CONTINUE_LATER_LIMIT`, `CONTINUE_LATER_FROM_CWD`, `CONTINUE_LATER_SKIP_TRANSCRIPT`, `CONTINUE_LATER_CLI_DIR`, `CONTINUE_LATER_BIN_DIR` (installer).
+Env: `CONTINUE_LATER_AGENT`, `CONTINUE_LATER_LIMIT`, `CONTINUE_LATER_FROM_CWD`, `CONTINUE_LATER_SKIP_TRANSCRIPT`, `CONTINUE_LATER_CLI_DIR`, `CONTINUE_LATER_BIN_DIR` (installer). **`CONTINUE_LATER_CURSOR_HOOK=0`** skips registering the Cursor **`beforeSubmitPrompt`** hook during install.
 
 ## Use
 

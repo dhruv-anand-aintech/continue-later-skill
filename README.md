@@ -10,7 +10,7 @@ Fetches the latest `main` tarball and copies **continue-later**, **continue-late
 curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/install.sh | bash
 ```
 
-Requirements: `curl`, `tar`, `bash`, network access. No Git binary required.
+Requirements: `curl`, `tar`, `bash`, `python3` (for merging **`~/.cursor/hooks.json`** when the Cursor hook is installed), network access. No Git binary required.
 
 ### Override destinations (optional)
 
@@ -74,6 +74,10 @@ Discovery follows the same `~/.claude/projects/**/*.jsonl` layout tools such as 
 
 If you use **Claude Code**, you can install a **`UserPromptSubmit`** hook that archives **`continuation.md`** / **`continuation-fast.md`** when present, runs the git dump, and injects **`=== CONTINUATION CONTEXT DUMP`** into context so the agent does not need to shell out first. See **[claude-code/README.md](claude-code/README.md)** and **[claude-code/hooks/continue-later-dump.sh](claude-code/hooks/continue-later-dump.sh)**.
 
+### Cursor: `beforeSubmitPrompt` hook
+
+**`install.sh`** copies **[`cursor/hooks/continue-later-before-submit.sh`](cursor/hooks/continue-later-before-submit.sh)** to **`~/.cursor/hooks/`** and appends it to **`~/.cursor/hooks.json`** (user-level hook; runs from **`~/.cursor/`**). On prompts that match the same continuation-style phrases as the Claude hook, it resolves the workspace git root from Cursor’s **`workspace_roots`** / attachments, then runs **`continue-later-fast`** so **`continuation-fast.md`** is written **before** the request is sent. Cursor hooks **cannot** prepend text to the prompt (only allow/block); the handoff file on disk is the main effect. Opt out of hook registration with **`CONTINUE_LATER_CURSOR_HOOK=0`**.
+
 ## What gets installed
 
 
@@ -89,6 +93,7 @@ If you use **Claude Code**, you can install a **`UserPromptSubmit`** hook that a
 | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `$CONTINUE_LATER_CLI_DIR` (default **`~/.config/continue-later/`**)                                | **`continue-later-fast.sh`**, **`git-context-dump.sh`**, **`session_recent_user_messages.py`**.                             |
 | `$CONTINUE_LATER_BIN_DIR/continue-later-fast` (default **`~/.local/bin/continue-later-fast`**) | Symlink to **`continue-later-fast.sh`** — run from any repo after **`cd`** to git root (ensure **`BIN_DIR`** is on `PATH`). |
+| **`~/.cursor/hooks/continue-later-before-submit.sh`** (after **`install.sh`**, unless **`CONTINUE_LATER_CURSOR_HOOK=0`**) | Cursor **`beforeSubmitPrompt`** hook: runs **`continue-later-fast`** on matching chat prompts. |
 
 
 Source files in this repo: [skills/continue-later/](skills/continue-later/), [skills/continue-later-fast/](skills/continue-later-fast/), [skills/resume-continuation/](skills/resume-continuation/).
