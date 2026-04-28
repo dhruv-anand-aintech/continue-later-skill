@@ -48,7 +48,7 @@
     "claudeCodeHook": "claude-code/README.md"
   },
   "features": [
-    "One-command install via install.sh into ~/.cursor/skills",
+    "install.sh discovers Cursor/Claude/Codex/agents/Gemini/OpenCode skill dirs (optional AGENT_SKILLS_DIRS)",
     "continue-later: structured continuation.md",
     "continue-later-fast: raw git dump to continuation-fast.md",
     "resume-continuation: summarize continuation.md or continuation-fast.md",

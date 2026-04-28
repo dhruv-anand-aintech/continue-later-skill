@@ -4,21 +4,26 @@ Cursor skills for **structured handoffs** (`continuation.md`), **quick raw dumps
 
 ## Install (one command)
 
-Copies three skill folders into `~/.cursor/skills/` (override with `CURSOR_SKILLS_DIR`):
+Fetches the latest `main` tarball and copies **`continue-later`**, **`continue-later-fast`**, and **`resume-continuation`** into your agent skill folders. **No skill-dir variable is required:** the script installs everywhere it can find an existing assistant home directory (same discovery idea as **agent-rules-sync-standalone** / `AgentSkillsSync.frameworks`: Cursor, Claude Code, Codex, shared `~/.agents`, Gemini Antigravity, OpenCode). If none of those homes exist yet, it creates **`~/.cursor/skills`**.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/install.sh | bash
 ```
 
-Requirements: `curl`, `tar`, and network access. No Git binary required.
+Requirements: `curl`, `tar`, `bash`, network access. No Git binary required.
 
-### Claude Code / custom skills directory
+### Override destinations (optional)
 
-Install into another tree (for example `~/.claude/skills`):
+- **`AGENT_SKILLS_DIRS`** — colon-separated list of roots (only these paths):
 
-```bash
-CURSOR_SKILLS_DIR="$HOME/.claude/skills" curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/install.sh | bash
-```
+  ```bash
+  AGENT_SKILLS_DIRS="$HOME/.cursor/skills:$HOME/.claude/skills" \
+    curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/install.sh | bash
+  ```
+
+- **`CURSOR_SKILLS_DIR`** — legacy single directory (still supported).
+
+When unset, discovery checks which of **`~/.cursor`**, **`~/.claude`**, **`$CODEX_HOME` / `~/.codex`**, **`~/.agents`**, **`~/.gemini/antigravity`**, **`~/.config/opencode`** exist and installs under each corresponding **`…/skills`** tree.
 
 ### Forks or alternate branches
 
@@ -29,7 +34,7 @@ curl -fsSL "https://raw.githubusercontent.com/<fork-owner>/continue-later-skill/
   CONTINUE_LATER_SKILLS_REPO="<fork-owner>/continue-later-skill" CONTINUE_LATER_SKILLS_BRANCH=main bash
 ```
 
-Restart Cursor (or reload the window) after installing.
+Restart Cursor, Claude Code, or other assistants after installing so skills reload.
 
 ### Continue later fast (CLI script)
 
