@@ -1,85 +1,68 @@
-# Continue Later Skill
+# Continue Later Skills
 
-A **Cursor skill** for generating and managing project continuation documentation. Install via **Skillfish marketplace**—no npm or additional setup required.
+Cursor skills for **structured handoffs** (`continuation.md`), **quick raw git dumps**, and **resuming** from an existing continuation—without a marketplace or npm.
 
-## What It Does
+## Install (one command)
 
-When you ask your AI to "hand this off" or "continue later," it generates a comprehensive `continuation.md` file with:
+Copies three skill folders into `~/.cursor/skills/` (override with `CURSOR_SKILLS_DIR`):
 
-- Project overview and tech stack
-- Current state (working/broken/in-progress)
-- Recent changes and decisions
-- Pending tasks (next steps)
-- Gotchas & traps (lessons learned)
-- Build and deploy instructions
+```bash
+curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/install.sh | bash
+```
 
-When you ask to "resume from earlier," it reads your existing `continuation.md` and surfaces the relevant sections.
+Requirements: `curl`, `tar`, and network access. No Git binary required.
 
-## Installation
+### Claude Code / custom skills directory
 
-**Install from Skillfish marketplace:** [mcpmarket.com](https://mcpmarket.com)
+Install into another tree (for example `~/.claude/skills`):
 
-1. Go to Skillfish marketplace
-2. Search for "Continue Later"
-3. Click Install
-4. The skill is available in Cursor—no npm, no CLI, no extra setup
+```bash
+CURSOR_SKILLS_DIR="$HOME/.claude/skills" curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/install.sh | bash
+```
+
+### Forks or alternate branches
+
+Point the installer at your fork’s tarball (and use the same repo for `install.sh`):
+
+```bash
+curl -fsSL "https://raw.githubusercontent.com/<fork-owner>/continue-later-skill/main/install.sh" | \
+  CONTINUE_LATER_SKILLS_REPO="<fork-owner>/continue-later-skill" CONTINUE_LATER_SKILLS_BRANCH=main bash
+```
+
+Restart Cursor (or reload the window) after installing.
+
+## What gets installed
+
+| Skill folder | Role |
+|----------------|------|
+| `continue-later` | Full structured `continuation.md` (overview, stack, state, tasks, gotchas, deploy). |
+| `continue-later-fast` | Archive existing file, dump raw git context into `continuation.md`—no narrative summary. |
+| `resume-continuation` | Read and summarize existing `continuation.md` (“resume from earlier”, pending tasks, gotchas). |
+
+Source files in this repo: [skills/continue-later/](skills/continue-later/), [skills/continue-later-fast/](skills/continue-later-fast/), [skills/resume-continuation/](skills/resume-continuation/).
 
 ## Usage
 
-### Generate a Continuation
+Ask the agent in natural language, for example:
 
-Say to your AI:
-- "Hand this off"
-- "Create a continuation for the team"
-- "Save project state—I'm done for the day"
-- "Document where we left off"
+- **Handoff:** “Hand this off”, “continue later”, “save project state”, “document where we left off”
+- **Quick dump:** “quick save”, “continue-later-fast”, “just dump the context”
+- **Resume:** “resume from earlier”, “what was I working on?”, “show pending tasks”
 
-The AI generates `continuation.md` in your project root following the skill's structure.
+## Continuation structure (full skill)
 
-### Resume From Earlier
+The **continue-later** skill defines markdown sections such as project overview, tech stack, build/run commands, current state, pending tasks, decisions, gotchas, and deploy steps.
 
-Say to your AI:
-- "Resume from earlier"
-- "What was I working on?"
-- "Show me the pending tasks"
-- "What are the gotchas?"
+## Example file
 
-The AI reads `continuation.md` and presents the relevant information.
+See [examples/continuation-example.md](examples/continuation-example.md).
 
-## Continuation Structure
+## Use cases
 
-The skill produces markdown with these sections:
-
-| Section | Purpose |
-|---------|---------|
-| What This Project Is | 2-3 sentence overview |
-| Tech Stack | Languages, frameworks, databases |
-| How to Build & Run | Exact commands |
-| Key Files | File → purpose table |
-| What Was Just Done | Recent changes (specific) |
-| Current State | Working / broken / in progress |
-| Pending Tasks | Next steps (verbatim) |
-| Key Technical Decisions | Don't re-litigate |
-| Gotchas & Traps | Lessons learned |
-| How to Deploy | Exact deploy commands |
-
-## Example
-
-See [examples/continuation-example.md](examples/continuation-example.md) for an example.
-
-## Continue Later Fast (companion skill)
-
-For a **minimal, no-summary** handoff: raw git context only (`git log`, `status`, `diff --stat`, recent files), written straight to `continuation.md` with no LLM narrative. Useful for “quick save,” “just dump the context,” or as a fast step before running the full Continue Later skill.
-
-- **Skill file:** [skills/continue-later-fast/SKILL.md](skills/continue-later-fast/SKILL.md)
-- **Manual install:** copy the `continue-later-fast` folder into your skills directory (for example `.cursor/skills/` or `.claude/skills/`, depending on your setup) so the agent loads `SKILL.md` from that folder name.
-
-## Use Cases
-
-- **Team handoffs** — Hand off to teammates with full context
-- **Long projects** — Resume after weeks with zero ramp-up
-- **Onboarding** — New developers get complete context
-- **Knowledge preservation** — Capture decisions before people leave
+- Team handoffs and async collaboration
+- Long-running projects with gaps between sessions
+- Onboarding with preserved context
+- Capturing decisions and traps before context switches
 
 ## License
 

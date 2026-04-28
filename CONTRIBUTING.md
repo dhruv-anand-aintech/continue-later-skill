@@ -1,7 +1,7 @@
 # Contributing
 
-1. Fork the repository
-2. Edit SKILL.md or documentation
-3. Submit a pull request
+1. Fork the repository.
+2. Edit the skills under `skills/{continue-later,continue-later-fast,resume-continuation}/SKILL.md`, or docs like `README.md` and `install.sh`.
+3. Submit a pull request.
 
-No build step. No npm. Just markdown and docs.
+No build step and no npm. Keep `install.sh` working for the default branch tarball layout (`skills/<name>/SKILL.md`).

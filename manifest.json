@@ -37,18 +37,18 @@
     "just dump the context"
   ],
   "documentation": {
-    "main": "SKILL.md",
+    "main": "skills/continue-later/SKILL.md",
     "example": "examples/continuation-example.md",
-    "continueLaterFast": "skills/continue-later-fast/SKILL.md"
+    "continueLaterFast": "skills/continue-later-fast/SKILL.md",
+    "resumeContinuation": "skills/resume-continuation/SKILL.md",
+    "install": "install.sh"
   },
   "features": [
-    "Generate continuation.md from project context",
-    "Structured sections: project, state, tasks, gotchas, decisions",
-    "Resume from existing continuation files",
-    "Section extraction for quick lookups",
-    "Git-friendly versioning",
-    "No external dependencies",
-    "Optional continue-later-fast: raw git dump to continuation.md with no LLM summary (see skills/continue-later-fast/)"
+    "One-command install via install.sh into ~/.cursor/skills",
+    "continue-later: structured continuation.md",
+    "continue-later-fast: raw git dump only",
+    "resume-continuation: summarize existing continuation.md",
+    "No marketplace, no npm—curl and bash only"
   ],
   "useCases": [
     "Team handoffs and transitions",

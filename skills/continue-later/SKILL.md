@@ -1,17 +1,23 @@
-# Continue Later Skill
+---
+name: continue-later
+description: Generate a structured continuation.md for handoffs—project context, state, tasks, gotchas, and deploy steps. Use when the user wants to save state or hand off work (not for quick raw git dumps; use continue-later-fast for that).
+---
+
+# Continue Later
 
 Generate and manage project continuation documentation for seamless handoffs, team transitions, and knowledge preservation across coding sessions.
 
 ## Overview
 
-The **Continue Later** skill provides a structured approach to documenting project state. When the user asks to hand off work, save state, or create a continuation, you generate a comprehensive `continuation.md` file following this structure.
+When the user asks to hand off work, save state, or create a continuation, generate a comprehensive `continuation.md` following this structure.
 
 **Use this skill when the user says:**
 - "Hand this off" / "Continue later" / "Save project state"
 - "Create a continuation for the team"
 - "Document where we left off"
 - "I'm done for the day, create handoff docs"
-- "Resume from earlier" / "What was I working on?" (read existing continuation.md)
+
+For summarizing an existing `continuation.md`, use the **resume-continuation** skill. For a raw git-only dump with no narrative, use **continue-later-fast**.
 
 ## Continuation.md Structure
 
@@ -89,19 +95,6 @@ Description of what went wrong.
 5. **Include exact commands.** The next agent should copy-paste build, run, test, and deploy commands.
 6. **Write to project root** as `continuation.md`, so it's immediately visible.
 
-## When User Asks to "Resume From Earlier"
-
-If the user has an existing `continuation.md`:
-
-1. Read the file
-2. Summarize or extract the section they need:
-   - **Tasks** → Pending tasks (what to do next)
-   - **Gotchas** → Lessons learned (avoid repeating mistakes)
-   - **State** → What works, what's broken, what's in progress
-   - **Decisions** → Don't re-litigate these
-   - **Build** → How to get running
-3. Present the relevant information clearly
-
 ## Anti-Patterns to Avoid
 
 - ❌ Vague state: "mostly working" → ✅ "11 rows in DB, gallery shows 0 due to pending refreshGallery fix"
@@ -117,9 +110,3 @@ The original regex only matched 24-hour filenames. Zero screenshots were indexed
 **Solution:** Updated regex to match `Screenshot 2024-10-30 at 11.07.04 AM.png`
 **Lesson:** Test with real production data formats early.
 ```
-
-## Installation
-
-**Install via Skillfish marketplace.** This skill is distributed through Skillfish. Add it to Cursor from the Skillfish marketplace—no npm or additional setup required.
-
-Once installed, the AI has access to this skill and will generate or read continuations when you ask.

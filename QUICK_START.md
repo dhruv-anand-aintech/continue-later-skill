@@ -1,33 +1,21 @@
-# Quick Start
+# Quick start
 
 ## Install
 
-Install from **Skillfish marketplace** at [mcpmarket.com](https://mcpmarket.com). Search for "Continue Later" and click Install.
+Run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/install.sh | bash
+```
+
+Then restart Cursor (or reload the window).
 
 ## Use
 
-### Generate a Continuation
+| You say | Skill |
+|---------|--------|
+| Hand this off / continue later / save state | **continue-later** → writes structured `continuation.md` |
+| Quick save / dump raw git only | **continue-later-fast** |
+| Resume from earlier / what was I working on | **resume-continuation** reads `continuation.md` |
 
-Say to your AI:
-- "Hand this off"
-- "Create a continuation"
-- "Save project state"
-
-The AI generates `continuation.md` in your project root.
-
-### Resume From Earlier
-
-Say to your AI:
-- "Resume from earlier"
-- "What was I working on?"
-- "Show me the pending tasks"
-
-The AI reads `continuation.md` and presents the relevant sections.
-
-### Continue Later Fast (optional)
-
-Say **“quick save”** or **“/continue-later-fast”** if you installed the companion skill from [skills/continue-later-fast/SKILL.md](skills/continue-later-fast/SKILL.md). It writes raw git output to `continuation.md` with no narrative summary—fast ground truth before a full handoff.
-
-## That's It
-
-No npm, no CLI, no config files. Install from Skillfish and use natural language.
+No npm, no marketplace. Optional: `CURSOR_SKILLS_DIR` to choose the install folder (default `~/.cursor/skills`).
