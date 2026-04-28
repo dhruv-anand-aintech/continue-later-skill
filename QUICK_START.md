@@ -12,13 +12,13 @@ Then restart Cursor (or reload the window).
 
 ### CLI only (continue-later-fast)
 
-From your project directory:
+Needs **`git-context-dump.sh`** beside **`continue-later-fast.sh`** (shared git snapshot). From your project directory:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dhruvanand-aintech/continue-later-skill/main/scripts/continue-later-fast.sh | bash
+./continue-later-fast.sh
 ```
 
-Writes **`continuation-fast.md`** with a raw git dump (no Cursor skills needed). That one-liner does **not** bundle `session_recent_user_messages.py`; for **recent user messages** from Claude/Cursor JSONL, clone the repo and run `./scripts/continue-later-fast.sh --agent "<session-id>"`.
+See [README.md](README.md) for downloading both scripts with `curl`. For **recent user messages**, add **`session_recent_user_messages.py`** and run `./scripts/continue-later-fast.sh --agent "<session-id>"`.
 
 Env: `CONTINUE_LATER_AGENT`, `CONTINUE_LATER_LIMIT`, `CONTINUE_LATER_FROM_CWD=1` with `--from-cwd`.
 
