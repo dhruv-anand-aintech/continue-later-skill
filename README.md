@@ -31,6 +31,18 @@ curl -fsSL "https://raw.githubusercontent.com/<fork-owner>/continue-later-skill/
 
 Restart Cursor (or reload the window) after installing.
 
+### Continue later fast (CLI script)
+
+Dump raw git state to `continuation.md` **without installing skills** — run **from your project root** (the script resolves to the git repository root when inside a repo):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/scripts/continue-later-fast.sh | bash
+```
+
+Requires `bash`, `git`, `curl`. Same output shape as [skills/continue-later-fast/SKILL.md](skills/continue-later-fast/SKILL.md).
+
+If you already cloned this repo, run `./scripts/continue-later-fast.sh` from any directory inside the working tree (it `cd`s to the git root when `.git` exists).
+
 ### Claude Code: hook (programmatic dump before the LLM)
 
 If you use **Claude Code**, you can install a **`UserPromptSubmit`** hook that archives `continuation.md`, runs the git dump, and injects **`=== CONTINUATION CONTEXT DUMP`** into context so the agent does not need to shell out first. See **[claude-code/README.md](claude-code/README.md)** and **[claude-code/hooks/continue-later-dump.sh](claude-code/hooks/continue-later-dump.sh)**.

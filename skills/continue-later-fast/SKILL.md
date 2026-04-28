@@ -28,6 +28,14 @@ Fastest possible handoff: archive existing `continuation.md`, run the git dump s
 Look for `=== CONTINUATION CONTEXT DUMP` in your context (injected by the Claude Code `UserPromptSubmit` hook—see `claude-code/hooks/continue-later-dump.sh` in the [continue-later-skill](https://github.com/dhruv-anand-aintech/continue-later-skill) repo).
 
 - **If present:** use it as the content. Skip the tool call below.
+- **Or run the CLI script** from the repo (no agent): see `scripts/continue-later-fast.sh` — one-shot:
+
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/scripts/continue-later-fast.sh | bash
+  ```
+
+  Run it **from your project directory** (or `cd` there first); it jumps to the git repo root when applicable.
+
 - **If absent:** run this via Bash tool:
 
 ```bash
