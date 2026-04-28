@@ -12,7 +12,13 @@
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DUMP="$SCRIPT_DIR/git-context-dump.sh"
 PY="$SCRIPT_DIR/session_recent_user_messages.py"
+
+if [[ ! -f "$DUMP" ]]; then
+  echo "error: git-context-dump.sh must sit beside continue-later-fast.sh (same scripts/ directory). Clone the repo or curl both raw files." >&2
+  exit 1
+fi
 
 AGENT="${CONTINUE_LATER_AGENT:-}"
 LIMIT="${CONTINUE_LATER_LIMIT:-12}"
@@ -102,7 +108,7 @@ elif [[ "$FROM_CWD" == "1" ]]; then
 fi
 
 {
-  "$SCRIPT_DIR/git-context-dump.sh" markdown-full
+  bash "$DUMP" markdown-full
   if [[ ${#PY_ARGS[@]} -gt 0 ]]; then
     echo ""
     if [[ ! -f "$PY" ]]; then

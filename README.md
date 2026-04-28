@@ -35,10 +35,14 @@ Restart Cursor (or reload the window) after installing.
 
 Requires `bash`, `git`, `python3`, [`scripts/git-context-dump.sh`](scripts/git-context-dump.sh) (shared git snapshot—used by **`continue-later-fast.sh`** and the Claude hook), and—**for transcript excerpts**—[`scripts/session_recent_user_messages.py`](scripts/session_recent_user_messages.py). Clone the repo or download the needed files into the same directory.
 
-**Git-only** (single-file curl — no recent user messages):
+**Git-only** — fetch **`git-context-dump.sh`** and **`continue-later-fast.sh`** into the **same directory**, then run (single-file curl alone will fail—the wrapper calls `git-context-dump.sh`):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/scripts/continue-later-fast.sh | bash
+mkdir -p ~/.local/share/continue-later-skill/scripts && cd $_
+curl -fsSO https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/scripts/git-context-dump.sh
+curl -fsSO https://raw.githubusercontent.com/dhruv-anand-aintech/continue-later-skill/main/scripts/continue-later-fast.sh
+chmod +x git-context-dump.sh continue-later-fast.sh
+./continue-later-fast.sh
 ```
 
 **Git + last user prompts from Claude Code / Cursor JSONL** — writes **`continuation-fast.md`** (session id = transcript filename stem under `~/.claude/projects` or `~/.cursor/projects`, see skill doc):
