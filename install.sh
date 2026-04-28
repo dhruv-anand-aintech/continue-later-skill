@@ -25,10 +25,12 @@ _resolve_codex_home() {
     printf '%s' "${HOME}/.codex"
     return
   fi
-  case "$c" in
-    ~/*) c="${HOME}/${c:2}" ;;
-    ~)   c="${HOME}" ;;
-  esac
+  # Do not use `case ... ~/*)` — bash expands ~ inside case patterns and breaks paths like /Users/...
+  if [[ "${c:0:2}" == '~/' ]]; then
+    c="${HOME}/${c:2}"
+  elif [[ "$c" == '~' ]]; then
+    c="${HOME}"
+  fi
   printf '%s' "$c"
 }
 
@@ -94,10 +96,11 @@ fi
 
 for i in "${!DESTINATIONS[@]}"; do
   p="${DESTINATIONS[$i]}"
-  case "$p" in
-    ~/*) DESTINATIONS[$i]="${HOME}/${p:2}" ;;
-    ~)   DESTINATIONS[$i]="${HOME}" ;;
-  esac
+  if [[ "${p:0:2}" == '~/' ]]; then
+    DESTINATIONS[$i]="${HOME}/${p:2}"
+  elif [[ "$p" == '~' ]]; then
+    DESTINATIONS[$i]="${HOME}"
+  fi
 done
 
 for DEST in "${DESTINATIONS[@]}"; do
