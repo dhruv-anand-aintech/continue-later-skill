@@ -121,7 +121,7 @@ fi
 
 for i in "${!DESTINATIONS[@]}"; do
   p="${DESTINATIONS[$i]}"
-  if [[ "${p:0:2}" == '~/' ]]; then
+  if [[ "${p:0:1}" == "~" && "${p:1:1}" == "/" ]]; then
     DESTINATIONS[i]="${HOME}/${p:2}"
   elif [[ "$p" == '~' ]]; then
     DESTINATIONS[i]="${HOME}"
