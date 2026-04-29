@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Shell syntax
+        run: bash -n install.sh scripts/*.sh claude-code/hooks/*.sh cursor/hooks/*.sh
+
+      - name: ShellCheck
+        run: shellcheck install.sh scripts/*.sh claude-code/hooks/*.sh cursor/hooks/*.sh
+
+      - name: JSON validation
+        run: python3 -m json.tool manifest.json >/dev/null
+
+      - name: Python tests
+        run: python3 -m unittest discover -s tests

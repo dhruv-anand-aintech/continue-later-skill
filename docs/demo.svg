@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="500" viewBox="0 0 980 500" role="img" aria-labelledby="title desc">
+  <title id="title">Continue Later workflow demo</title>
+  <desc id="desc">A terminal-style demo showing continue later creating a handoff file and resume from earlier reading it.</desc>
+  <rect width="980" height="500" fill="#f7f7f4"/>
+  <rect x="40" y="38" width="900" height="424" rx="8" fill="#202124"/>
+  <rect x="40" y="38" width="900" height="42" rx="8" fill="#303134"/>
+  <circle cx="70" cy="59" r="7" fill="#ff6b5f"/>
+  <circle cx="94" cy="59" r="7" fill="#f5c242"/>
+  <circle cx="118" cy="59" r="7" fill="#57c785"/>
+  <text x="150" y="65" fill="#e8eaed" font-family="Menlo, Consolas, monospace" font-size="15">continue-later demo</text>
+
+  <text x="72" y="120" fill="#9aa0a6" font-family="Menlo, Consolas, monospace" font-size="17">$</text>
+  <text x="96" y="120" fill="#e8eaed" font-family="Menlo, Consolas, monospace" font-size="17">continue-later-fast -n 3</text>
+  <text x="72" y="158" fill="#8ab4f8" font-family="Menlo, Consolas, monospace" font-size="17">Written: continuation-fast.md</text>
+  <text x="72" y="196" fill="#bdc1c6" font-family="Menlo, Consolas, monospace" font-size="17">Includes git status, recent commits, diff summary, and recent prompts.</text>
+
+  <line x1="86" y1="238" x2="894" y2="238" stroke="#5f6368" stroke-width="1"/>
+
+  <text x="72" y="286" fill="#9aa0a6" font-family="Menlo, Consolas, monospace" font-size="17">You:</text>
+  <text x="126" y="286" fill="#e8eaed" font-family="Menlo, Consolas, monospace" font-size="17">resume from earlier</text>
+
+  <text x="72" y="324" fill="#9aa0a6" font-family="Menlo, Consolas, monospace" font-size="17">Agent:</text>
+  <text x="138" y="324" fill="#e8eaed" font-family="Menlo, Consolas, monospace" font-size="17">Reads continuation.md or continuation-fast.md</text>
+  <text x="138" y="362" fill="#e8eaed" font-family="Menlo, Consolas, monospace" font-size="17">Reports current objective, next tasks, blockers, and gotchas</text>
+  <text x="138" y="400" fill="#e8eaed" font-family="Menlo, Consolas, monospace" font-size="17">Continues without rediscovering the repo from scratch</text>
+</svg>
