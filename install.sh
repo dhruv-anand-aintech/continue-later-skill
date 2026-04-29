@@ -36,7 +36,7 @@ _resolve_codex_home() {
     return
   fi
   # Do not use `case ... ~/*)` — bash expands ~ inside case patterns and breaks paths like /Users/...
-  if [[ "${c:0:2}" == '~/' ]]; then
+  if [[ "${c:0:1}" == "~" && "${c:1:1}" == "/" ]]; then
     c="${HOME}/${c:2}"
   elif [[ "$c" == '~' ]]; then
     c="${HOME}"
@@ -122,9 +122,9 @@ fi
 for i in "${!DESTINATIONS[@]}"; do
   p="${DESTINATIONS[$i]}"
   if [[ "${p:0:2}" == '~/' ]]; then
-    DESTINATIONS[$i]="${HOME}/${p:2}"
+    DESTINATIONS[i]="${HOME}/${p:2}"
   elif [[ "$p" == '~' ]]; then
-    DESTINATIONS[$i]="${HOME}"
+    DESTINATIONS[i]="${HOME}"
   fi
 done
 
