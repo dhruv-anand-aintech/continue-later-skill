@@ -23,7 +23,7 @@ Requirements: `curl`, `tar`, `bash`, `python3` (for merging **`~/.cursor/hooks.j
 
 When unset, discovery checks which of **`~/.cursor`**, **`~/.claude`**, **`$CODEX_HOME`** / **`~/.codex`**, **`~/.agents`**, **`~/.gemini/antigravity`**, **`~/.config/opencode`** exist and installs under each corresponding **`…/skills`** tree.
 
-- **`CONTINUE_LATER_CLI_DIR`** — where the three scripts are copied (default `${XDG_CONFIG_HOME:-$HOME/.config}/continue-later`).
+- **`CONTINUE_LATER_CLI_DIR`** — where the CLI and hook scripts are copied (default `${XDG_CONFIG_HOME:-$HOME/.config}/continue-later`).
 - **`CONTINUE_LATER_BIN_DIR`** — where the **`continue-later-fast`** symlink is created (default **`~/.local/bin`**).
 
 ### Forks or alternate branches
@@ -78,6 +78,10 @@ If you use **Claude Code**, you can install a **`UserPromptSubmit`** hook that a
 
 **`install.sh`** copies **[`cursor/hooks/continue-later-before-submit.sh`](cursor/hooks/continue-later-before-submit.sh)** to **`~/.cursor/hooks/`** and appends it to **`~/.cursor/hooks.json`** (user-level hook; runs from **`~/.cursor/`**). On prompts that match the same continuation-style phrases as the Claude hook, it resolves the workspace git root from Cursor’s **`workspace_roots`** / attachments, then runs **`continue-later-fast`** so **`continuation-fast.md`** is written **before** the request is sent. Cursor hooks **cannot** prepend text to the prompt (only allow/block); the handoff file on disk is the main effect. Opt out of hook registration with **`CONTINUE_LATER_CURSOR_HOOK=0`**.
 
+### Codex and Gemini hooks
+
+When **`~/.codex`** exists, **`install.sh`** registers a Codex **`UserPromptSubmit`** hook in **`~/.codex/hooks.json`** and enables **`features.codex_hooks = true`** in **`~/.codex/config.toml`**. When **`~/.gemini`** exists, it registers a Gemini **`BeforeAgent`** hook in **`~/.gemini/settings.json`**. Both use **`continue-later-prompt-hook.sh`** from the installed CLI bundle and inject the shared git context dump on continuation-style prompts. Opt out with **`CONTINUE_LATER_CODEX_HOOK=0`** or **`CONTINUE_LATER_GEMINI_HOOK=0`**.
+
 ## What gets installed
 
 
@@ -91,9 +95,11 @@ If you use **Claude Code**, you can install a **`UserPromptSubmit`** hook that a
 
 | Path                                                                                               | Role                                                                                                                        |
 | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `$CONTINUE_LATER_CLI_DIR` (default **`~/.config/continue-later/`**)                                | **`continue-later-fast.sh`**, **`git-context-dump.sh`**, **`session_recent_user_messages.py`**.                             |
+| `$CONTINUE_LATER_CLI_DIR` (default **`~/.config/continue-later/`**)                                | **`continue-later-fast.sh`**, **`git-context-dump.sh`**, **`session_recent_user_messages.py`**, **`continue-later-prompt-hook.sh`**. |
 | `$CONTINUE_LATER_BIN_DIR/continue-later-fast` (default **`~/.local/bin/continue-later-fast`**) | Symlink to **`continue-later-fast.sh`** — run from any repo after **`cd`** to git root (ensure **`BIN_DIR`** is on `PATH`). |
 | **`~/.cursor/hooks/continue-later-before-submit.sh`** (after **`install.sh`**, unless **`CONTINUE_LATER_CURSOR_HOOK=0`**) | Cursor **`beforeSubmitPrompt`** hook: runs **`continue-later-fast`** on matching chat prompts. |
+| **`~/.codex/hooks.json`** (after **`install.sh`**, unless **`CONTINUE_LATER_CODEX_HOOK=0`**) | Codex **`UserPromptSubmit`** hook: injects the shared git context dump on matching chat prompts. |
+| **`~/.gemini/settings.json`** (after **`install.sh`**, unless **`CONTINUE_LATER_GEMINI_HOOK=0`**) | Gemini **`BeforeAgent`** hook: injects the shared git context dump on matching chat prompts. |
 
 
 Source files in this repo: [skills/continue-later/](skills/continue-later/), [skills/continue-later-fast/](skills/continue-later-fast/), [skills/resume-continuation/](skills/resume-continuation/).

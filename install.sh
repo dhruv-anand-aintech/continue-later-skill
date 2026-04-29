@@ -22,6 +22,8 @@
 # When CONTINUE_LATER_CURSOR_HOOK is unset or non-zero: installs a Cursor beforeSubmitPrompt hook
 # (~/.cursor/hooks/continue-later-before-submit.sh + merge into ~/.cursor/hooks.json) so
 # continuation-style prompts trigger continue-later-fast on disk. Set CONTINUE_LATER_CURSOR_HOOK=0 to skip.
+# When CONTINUE_LATER_CODEX_HOOK / CONTINUE_LATER_GEMINI_HOOK are unset or non-zero:
+# registers Codex UserPromptSubmit / Gemini BeforeAgent hooks if those tool homes exist.
 set -euo pipefail
 
 OWNER_REPO="${CONTINUE_LATER_SKILLS_REPO:-dhruv-anand-aintech/continue-later-skill}"
@@ -41,6 +43,8 @@ _resolve_codex_home() {
   fi
   printf '%s' "$c"
 }
+
+codex_home="$(_resolve_codex_home)"
 
 _dedupe_array() {
   local -a src=("$@")
@@ -73,7 +77,7 @@ if [[ ! -d "${SKILLS_SRC}/continue-later" ]]; then
 fi
 
 SCRIPTS_SRC="${TOP}/scripts"
-for _need in continue-later-fast.sh git-context-dump.sh session_recent_user_messages.py; do
+for _need in continue-later-fast.sh git-context-dump.sh session_recent_user_messages.py continue-later-prompt-hook.sh; do
   if [[ ! -f "${SCRIPTS_SRC}/${_need}" ]]; then
     echo "error: missing ${SCRIPTS_SRC}/${_need}" >&2
     exit 1
@@ -96,7 +100,6 @@ elif [[ -n "${CURSOR_SKILLS_DIR:-}" ]]; then
   DESTINATIONS=("${CURSOR_SKILLS_DIR}")
 else
   h="$HOME"
-  codex_home="$(_resolve_codex_home)"
   [[ -d "${h}/.cursor" ]]             && DESTINATIONS+=("${h}/.cursor/skills" "${h}/.cursor/skills-cursor")
   [[ -d "${h}/.claude" ]]             && DESTINATIONS+=("${h}/.claude/skills")
   [[ -d "${codex_home}" ]]           && DESTINATIONS+=("${codex_home}/skills")
@@ -140,8 +143,8 @@ done
 _XDG_CFG="${XDG_CONFIG_HOME:-${HOME}/.config}"
 CLI_DIR="${CONTINUE_LATER_CLI_DIR:-${_XDG_CFG}/continue-later}"
 mkdir -p "${CLI_DIR}"
-cp "${SCRIPTS_SRC}/continue-later-fast.sh" "${SCRIPTS_SRC}/git-context-dump.sh" "${SCRIPTS_SRC}/session_recent_user_messages.py" "${CLI_DIR}/"
-chmod +x "${CLI_DIR}/continue-later-fast.sh" "${CLI_DIR}/git-context-dump.sh"
+cp "${SCRIPTS_SRC}/continue-later-fast.sh" "${SCRIPTS_SRC}/git-context-dump.sh" "${SCRIPTS_SRC}/session_recent_user_messages.py" "${SCRIPTS_SRC}/continue-later-prompt-hook.sh" "${CLI_DIR}/"
+chmod +x "${CLI_DIR}/continue-later-fast.sh" "${CLI_DIR}/git-context-dump.sh" "${CLI_DIR}/continue-later-prompt-hook.sh"
 
 BIN_DIR="${CONTINUE_LATER_BIN_DIR:-${HOME}/.local/bin}"
 mkdir -p "${BIN_DIR}"
@@ -189,6 +192,153 @@ else:
 PY
 fi
 
+if [[ "${CONTINUE_LATER_CODEX_HOOK:-1}" != "0" && -d "${codex_home}" ]]; then
+  mkdir -p "${codex_home}"
+  python3 - "${codex_home}/hooks.json" "${CLI_DIR}/continue-later-prompt-hook.sh" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+hooks_path = Path(sys.argv[1])
+script = sys.argv[2]
+cmd = f"bash {json.dumps(script)}"
+
+if hooks_path.exists():
+    try:
+        data = json.loads(hooks_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        print(f"error: invalid JSON in {hooks_path}: {e}", file=sys.stderr)
+        sys.exit(1)
+else:
+    data = {"hooks": {}}
+
+if not isinstance(data.get("hooks"), dict):
+    data["hooks"] = {}
+groups = data["hooks"].setdefault("UserPromptSubmit", [])
+if not isinstance(groups, list):
+    print(f"error: {hooks_path} hooks.UserPromptSubmit must be a list", file=sys.stderr)
+    sys.exit(1)
+
+already = any(
+    "continue-later-prompt-hook.sh" in str(h.get("command", ""))
+    for group in groups
+    if isinstance(group, dict)
+    for h in (group.get("hooks") or [])
+    if isinstance(h, dict)
+)
+if already:
+    print(f"Codex UserPromptSubmit hook already present in {hooks_path}")
+else:
+    groups.append(
+        {
+            "hooks": [
+                {
+                    "type": "command",
+                    "command": cmd,
+                    "timeout": 30,
+                    "statusMessage": "Loading continue-later context",
+                }
+            ]
+        }
+    )
+    hooks_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    print(f"Registered Codex UserPromptSubmit hook in {hooks_path}")
+PY
+
+  python3 - "${codex_home}/config.toml" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text(encoding="utf-8") if path.exists() else ""
+lines = text.splitlines()
+
+features_start = None
+features_end = len(lines)
+for i, line in enumerate(lines):
+    if re.match(r"\s*\[features\]\s*(?:#.*)?$", line):
+        features_start = i
+        for j in range(i + 1, len(lines)):
+            if re.match(r"\s*\[", lines[j]):
+                features_end = j
+                break
+        break
+
+if features_start is None:
+    if lines and lines[-1].strip():
+        lines.append("")
+    lines.extend(["[features]", "codex_hooks = true"])
+else:
+    key_re = re.compile(r"\s*codex_hooks\s*=")
+    for i in range(features_start + 1, features_end):
+        if key_re.match(lines[i]):
+            lines[i] = "codex_hooks = true"
+            break
+    else:
+        lines.insert(features_end, "codex_hooks = true")
+
+new = "\n".join(lines) + "\n"
+if new != text:
+    path.write_text(new, encoding="utf-8")
+    print(f"Enabled Codex hooks feature in {path}")
+PY
+fi
+
+if [[ "${CONTINUE_LATER_GEMINI_HOOK:-1}" != "0" && -d "${HOME}/.gemini" ]]; then
+  python3 - "${HOME}/.gemini/settings.json" "${CLI_DIR}/continue-later-prompt-hook.sh" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+settings_path = Path(sys.argv[1])
+script = sys.argv[2]
+cmd = f"bash {json.dumps(script)}"
+
+if settings_path.exists():
+    try:
+        data = json.loads(settings_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        print(f"error: invalid JSON in {settings_path}: {e}", file=sys.stderr)
+        sys.exit(1)
+else:
+    data = {}
+
+if not isinstance(data.get("hooks"), dict):
+    data["hooks"] = {}
+groups = data["hooks"].setdefault("BeforeAgent", [])
+if not isinstance(groups, list):
+    print(f"error: {settings_path} hooks.BeforeAgent must be a list", file=sys.stderr)
+    sys.exit(1)
+
+already = any(
+    "continue-later-prompt-hook.sh" in str(h.get("command", ""))
+    for group in groups
+    if isinstance(group, dict)
+    for h in (group.get("hooks") or [])
+    if isinstance(h, dict)
+)
+if already:
+    print(f"Gemini BeforeAgent hook already present in {settings_path}")
+else:
+    groups.append(
+        {
+            "hooks": [
+                {
+                    "name": "continue-later",
+                    "type": "command",
+                    "command": cmd,
+                    "timeout": 30000,
+                    "description": "Inject continue-later git context on handoff prompts",
+                }
+            ]
+        }
+    )
+    settings_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    print(f"Registered Gemini BeforeAgent hook in {settings_path}")
+PY
+fi
+
 echo ""
 echo "Installed (${#DESTINATIONS[@]} skill location(s)):"
 for DEST in "${DESTINATIONS[@]}"; do
@@ -196,13 +346,25 @@ for DEST in "${DESTINATIONS[@]}"; do
 done
 echo ""
 echo "Fast CLI (run from any git repo root; add ${BIN_DIR} to PATH if needed):"
-echo "  ${CLI_DIR}/{continue-later-fast.sh,git-context-dump.sh,session_recent_user_messages.py}"
+echo "  ${CLI_DIR}/{continue-later-fast.sh,git-context-dump.sh,session_recent_user_messages.py,continue-later-prompt-hook.sh}"
 echo "  ${BIN_DIR}/continue-later-fast → continue-later-fast.sh"
 echo ""
 if [[ "${CONTINUE_LATER_CURSOR_HOOK:-1}" != "0" ]]; then
   echo "Cursor hook (beforeSubmitPrompt): ~/.cursor/hooks/continue-later-before-submit.sh"
   echo "  Continuation-style chat prompts run continue-later-fast in the workspace git root."
   echo "  Skip with: CONTINUE_LATER_CURSOR_HOOK=0"
+  echo ""
+fi
+if [[ "${CONTINUE_LATER_CODEX_HOOK:-1}" != "0" && -d "${codex_home}" ]]; then
+  echo "Codex hook (UserPromptSubmit): ${codex_home}/hooks.json"
+  echo "  Continuation-style prompts inject the shared git context dump."
+  echo "  Skip with: CONTINUE_LATER_CODEX_HOOK=0"
+  echo ""
+fi
+if [[ "${CONTINUE_LATER_GEMINI_HOOK:-1}" != "0" && -d "${HOME}/.gemini" ]]; then
+  echo "Gemini hook (BeforeAgent): ~/.gemini/settings.json"
+  echo "  Continuation-style prompts inject the shared git context dump."
+  echo "  Skip with: CONTINUE_LATER_GEMINI_HOOK=0"
   echo ""
 fi
 echo "Restart each assistant (Cursor, Claude Code, Antigravity, OpenCode, Codex, …) or reload so skills apply."
