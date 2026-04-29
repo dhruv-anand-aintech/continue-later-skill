@@ -91,12 +91,25 @@ def iter_messages(jsonl_path: Path) -> Iterable[dict[str, Any]]:
                 continue
 
 
+_INJECTED_PREFIXES = (
+    "<command-message>",
+    "<command-name>",
+    "<system-reminder>",
+    "Base directory for this skill:",
+)
+
+
+def _is_injected(text: str) -> bool:
+    stripped = text.lstrip()
+    return any(stripped.startswith(p) for p in _INJECTED_PREFIXES)
+
+
 def collect_recent_prompts(jsonl_path: Path, limit: int) -> list[tuple[int, str]]:
     """Returns (line_index, text) newest last — we take the last `limit` human prompts."""
     found: list[tuple[int, str]] = []
     for i, obj in enumerate(iter_messages(jsonl_path)):
         text = extract_human_prompt(obj)
-        if text:
+        if text and not _is_injected(text):
             found.append((i, text))
     return found[-limit:]
 
