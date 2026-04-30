@@ -1,11 +1,13 @@
 ---
-name: resume-continuation
-description: Read and summarize continuation.md or continuation-fast.md (whichever exists—prefer structured continuation.md when both are present) so work can resume quickly without losing context.
+name: resume-from-earlier
+description: Resume work from continuation.md or continuation-fast.md. Use when the user runs /resume-from-earlier or asks to pick up from a handoff file—same logic as resume-continuation, shipped as its own skill folder so every platform discovers it by name.
 ---
 
-# Resume Continuation
+# Resume From Earlier
 
 Read and summarize project handoff markdown so work can resume quickly without losing context.
+
+This is a **separate skill folder** from **resume-continuation** so assistants that only load skills by directory name (not a shared manifest) still pick up the slash-style command **`/resume-from-earlier`**. The workflow is identical to **resume-continuation**.
 
 ## Files
 
@@ -16,15 +18,14 @@ Read and summarize project handoff markdown so work can resume quickly without l
 
 ## Overview
 
-Use this skill when the user asks to resume prior work, check project status, or recall the last session.
-
-**Use this skill when the user says** (natural language — no slash required):
-- "resume from continuation"
+**Use this skill when the user says:**
+- **`/resume-from-earlier`** (manual attach / slash command)
 - "resume from earlier"
+- "resume from continuation"
 - "what was I working on?"
 - "continue from last session"
 
-For **`/resume-from-earlier`** (slash / manual attach), use the **resume-from-earlier** skill folder — same workflow, separate install path for cross-platform discovery.
+Natural-language variants without a slash are also covered by the **resume-continuation** skill; either skill may run for the same request.
 
 ## Workflow
 

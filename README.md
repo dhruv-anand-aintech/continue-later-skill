@@ -6,7 +6,8 @@ It includes:
 
 - **`continue-later`** for a structured `continuation.md`
 - **`continue-later-fast`** for a raw git + recent prompt dump in `continuation-fast.md`
-- **`resume-continuation`** for picking work back up later
+- **`resume-continuation`** for picking work back up later (natural language)
+- **`resume-from-earlier`** — same resume workflow in its own folder for **`/resume-from-earlier`** and better discovery on every platform
 - optional Cursor, Claude Code, Codex, and Gemini hooks for automatic handoff context
 
 ![Continue Later workflow demo](docs/demo.svg)
@@ -46,7 +47,7 @@ Ask the agent in natural language:
 
 - **Handoff:** "Hand this off", "continue later", "save project state"
 - **Quick dump:** "quick save", "continue-later-fast", "just dump the context"
-- **Resume:** `resume from earlier`, `/resume`, `/resume-from-earlier`, `/resume-continuation`, "what was I working on?", "show pending tasks"
+- **Resume:** `/resume-from-earlier`, "resume from earlier", "what was I working on?", "show pending tasks" (natural language also matches **resume-continuation**)
 
 From a project git root:
 
@@ -64,7 +65,8 @@ That writes `continuation-fast.md` in the repo root.
 | --- | --- |
 | `continue-later` | Full structured `continuation.md` with overview, stack, state, tasks, decisions, gotchas, and deploy steps. |
 | `continue-later-fast` | Runs the fast CLI for `continuation-fast.md`; no narrative LLM summary in that file. |
-| `resume-continuation` | Reads `continuation.md` and/or `continuation-fast.md`, preferring the structured file when both exist. Slash-style: `/resume-continuation`, `/resume-from-earlier`, `/resume`. |
+| `resume-continuation` | Same handoff-read workflow; geared toward natural-language triggers. |
+| `resume-from-earlier` | Same logic as **`resume-continuation`**, but its own **`SKILL.md`** path so **`/resume-from-earlier`** and installs work consistently across assistants. |
 
 ### Files and Hooks
 
@@ -91,7 +93,7 @@ That writes `continuation-fast.md` in the repo root.
 ## How It Works
 
 1. The installer downloads the repo tarball from GitHub.
-2. It copies the three skill folders into any existing assistant skill homes it recognizes.
+2. It copies four skill folders into any existing assistant skill homes it recognizes.
 3. It copies the CLI bundle to `~/.config/continue-later/` by default.
 4. It symlinks `continue-later-fast` into `~/.local/bin/`.
 5. When supported tool homes exist, it registers prompt hooks that call the shared git-dump helper.
@@ -186,12 +188,13 @@ CONTINUE_LATER_CURSOR_HOOK=0 CONTINUE_LATER_CODEX_HOOK=0 CONTINUE_LATER_GEMINI_H
 Remove any installed skill folders you do not want:
 
 ```bash
-rm -rf ~/.cursor/skills/continue-later ~/.cursor/skills/continue-later-fast ~/.cursor/skills/resume-continuation
-rm -rf ~/.claude/skills/continue-later ~/.claude/skills/continue-later-fast ~/.claude/skills/resume-continuation
-rm -rf ~/.codex/skills/continue-later ~/.codex/skills/continue-later-fast ~/.codex/skills/resume-continuation
-rm -rf ~/.agents/skills/continue-later ~/.agents/skills/continue-later-fast ~/.agents/skills/resume-continuation
-rm -rf ~/.gemini/antigravity/skills/continue-later ~/.gemini/antigravity/skills/continue-later-fast ~/.gemini/antigravity/skills/resume-continuation
-rm -rf ~/.config/opencode/skills/continue-later ~/.config/opencode/skills/continue-later-fast ~/.config/opencode/skills/resume-continuation
+rm -rf ~/.cursor/skills/continue-later ~/.cursor/skills/continue-later-fast ~/.cursor/skills/resume-continuation ~/.cursor/skills/resume-from-earlier
+rm -rf ~/.cursor/skills-cursor/continue-later ~/.cursor/skills-cursor/continue-later-fast ~/.cursor/skills-cursor/resume-continuation ~/.cursor/skills-cursor/resume-from-earlier
+rm -rf ~/.claude/skills/continue-later ~/.claude/skills/continue-later-fast ~/.claude/skills/resume-continuation ~/.claude/skills/resume-from-earlier
+rm -rf ~/.codex/skills/continue-later ~/.codex/skills/continue-later-fast ~/.codex/skills/resume-continuation ~/.codex/skills/resume-from-earlier
+rm -rf ~/.agents/skills/continue-later ~/.agents/skills/continue-later-fast ~/.agents/skills/resume-continuation ~/.agents/skills/resume-from-earlier
+rm -rf ~/.gemini/antigravity/skills/continue-later ~/.gemini/antigravity/skills/continue-later-fast ~/.gemini/antigravity/skills/resume-continuation ~/.gemini/antigravity/skills/resume-from-earlier
+rm -rf ~/.config/opencode/skills/continue-later ~/.config/opencode/skills/continue-later-fast ~/.config/opencode/skills/resume-continuation ~/.config/opencode/skills/resume-from-earlier
 ```
 
 Remove the CLI bundle and symlink:
@@ -226,6 +229,7 @@ CI runs the same syntax, JSON, and Python checks.
 - [skills/continue-later/](skills/continue-later/)
 - [skills/continue-later-fast/](skills/continue-later-fast/)
 - [skills/resume-continuation/](skills/resume-continuation/)
+- [skills/resume-from-earlier/](skills/resume-from-earlier/)
 - [scripts/continue-later-fast.sh](scripts/continue-later-fast.sh)
 - [scripts/git-context-dump.sh](scripts/git-context-dump.sh)
 - [scripts/session_recent_user_messages.py](scripts/session_recent_user_messages.py)

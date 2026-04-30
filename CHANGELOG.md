@@ -2,6 +2,12 @@
 
 All notable changes to Continue Later Skills are documented here.
 
+## Unreleased
+
+### Added
+
+- **`resume-from-earlier`** skill folder: same workflow as **resume-continuation**, installed separately so **`/resume-from-earlier`** is discoverable on every platform (not only via a shared manifest).
+
 ## [1.0.0] - 2026-04-29
 
 ### Added

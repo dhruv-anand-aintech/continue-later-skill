@@ -130,7 +130,7 @@ done
 
 for DEST in "${DESTINATIONS[@]}"; do
   mkdir -p "${DEST}"
-  for name in continue-later continue-later-fast resume-continuation; do
+  for name in continue-later continue-later-fast resume-continuation resume-from-earlier; do
     if [[ ! -f "${SKILLS_SRC}/${name}/SKILL.md" ]]; then
       echo "error: missing ${SKILLS_SRC}/${name}/SKILL.md" >&2
       exit 1
@@ -342,7 +342,7 @@ fi
 echo ""
 echo "Installed (${#DESTINATIONS[@]} skill location(s)):"
 for DEST in "${DESTINATIONS[@]}"; do
-  echo "  ${DEST}/{continue-later,continue-later-fast,resume-continuation}/SKILL.md"
+  echo "  ${DEST}/{continue-later,continue-later-fast,resume-continuation,resume-from-earlier}/SKILL.md"
 done
 echo ""
 echo "Fast CLI (run from any git repo root; add ${BIN_DIR} to PATH if needed):"
