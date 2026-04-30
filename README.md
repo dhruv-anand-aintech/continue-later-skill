@@ -46,7 +46,7 @@ Ask the agent in natural language:
 
 - **Handoff:** "Hand this off", "continue later", "save project state"
 - **Quick dump:** "quick save", "continue-later-fast", "just dump the context"
-- **Resume:** "resume from earlier", "what was I working on?", "show pending tasks"
+- **Resume:** `resume from earlier`, `/resume`, `/resume-from-earlier`, `/resume-continuation`, "what was I working on?", "show pending tasks"
 
 From a project git root:
 
@@ -64,7 +64,7 @@ That writes `continuation-fast.md` in the repo root.
 | --- | --- |
 | `continue-later` | Full structured `continuation.md` with overview, stack, state, tasks, decisions, gotchas, and deploy steps. |
 | `continue-later-fast` | Runs the fast CLI for `continuation-fast.md`; no narrative LLM summary in that file. |
-| `resume-continuation` | Reads `continuation.md` and/or `continuation-fast.md`, preferring the structured file when both exist. |
+| `resume-continuation` | Reads `continuation.md` and/or `continuation-fast.md`, preferring the structured file when both exist. Slash-style: `/resume-continuation`, `/resume-from-earlier`, `/resume`. |
 
 ### Files and Hooks
 

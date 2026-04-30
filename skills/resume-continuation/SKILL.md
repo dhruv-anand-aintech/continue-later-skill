@@ -19,6 +19,8 @@ Read and summarize project handoff markdown so work can resume quickly without l
 Use this skill when the user asks to resume prior work, check project status, or recall the last session.
 
 **Use this skill when the user says:**
+- **`/resume-continuation`** (common manual attach label in Cursor)
+- **`/resume-from-earlier`** — same workflow; alias people remember from older docs or npm-style CLI naming
 - "/resume"
 - "resume from continuation"
 - "resume from earlier"

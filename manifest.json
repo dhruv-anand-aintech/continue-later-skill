@@ -17,6 +17,7 @@
     "project-management",
     "knowledge-preservation",
     "team-workflow",
+    "resume-from-earlier",
     "cursor-skill"
   ],
   "categories": [
@@ -30,6 +31,9 @@
     "save project state",
     "create a continuation",
     "document where we left off",
+    "/resume-continuation",
+    "/resume-from-earlier",
+    "/resume",
     "resume from earlier",
     "what was I working on",
     "/continue-later-fast",
@@ -53,7 +57,7 @@
     "install.sh discovers Cursor/Claude/Codex/agents/Gemini/OpenCode skill dirs (optional AGENT_SKILLS_DIRS)",
     "continue-later: structured continuation.md",
     "continue-later-fast: raw git dump + optional newest-mtime transcript excerpts to continuation-fast.md",
-    "resume-continuation: summarize continuation.md or continuation-fast.md",
+    "resume-continuation: summarize continuation.md or continuation-fast.md (aliases /resume-continuation, /resume-from-earlier)",
     "No marketplace, no npm—curl and bash only",
     "Optional Claude Code UserPromptSubmit hook (claude-code/) injects git dump before the LLM",
     "install.sh registers Cursor beforeSubmitPrompt hook (~/.cursor/hooks.json) to run continue-later-fast on matching prompts",
